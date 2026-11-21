@@ -1,6 +1,20 @@
 {
   "regua": 3.0,
-  "afinidade": {},
-  "evolucao": [],
-  "votos_contados": {}
+  "afinidade": {
+    "eu_nvr": 0.0
+  },
+  "evolucao": [
+    {
+      "quando": "2026-11-21T16:02:46-03:00",
+      "regua": 3.0
+    }
+  ],
+  "votos_contados": {
+    "1573769974076678275": {
+      "engracado": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    }
+  }
 }
