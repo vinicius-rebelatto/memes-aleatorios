@@ -1,0 +1,35 @@
+name: Moderar memes
+
+on:
+  schedule:
+    # De hora em hora: apaga os memes que levaram 🚫 da galera.
+    - cron: "47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: moderar-memes
+  cancel-in-progress: true
+
+jobs:
+  moderar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Apagar memes que passaram do ponto
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+        run: python -m bot.moderar

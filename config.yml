@@ -1,0 +1,40 @@
+# Configuração do bot de memes.
+# Depois de editar, é só salvar (commit): o próximo post já usa a configuração nova.
+# Os HORÁRIOS ficam nos arquivos da pasta .github/workflows (veja o README).
+
+# De onde vêm os memes. Cada fonte é um subreddit.
+# Quanto maior o peso, mais vezes a fonte é sorteada.
+# A cada post, o bot pega os memes recentes da fonte sorteada e posta o mais
+# votado que ainda não saiu no canal (é assim que aparece o "meme do momento").
+fontes:
+  - subreddit: eu_nvr
+    peso: 3
+  - subreddit: DiretoDoZapZap
+    peso: 2
+  - subreddit: me_irl
+    peso: 1
+
+votacao:
+  # Reação que a galera usa para votar no Meme da Semana.
+  emoji_voto: "😂"
+
+moderacao:
+  # Reação que significa "esse passou do ponto".
+  emoji_remover: "🚫"
+  # Quantas pessoas precisam marcar 🚫 para o bot apagar o meme.
+  votos_para_remover: 3
+
+ranking:
+  # Quantos dias para trás a votação do Meme da Semana considera.
+  dias: 7
+  # Quantas posições aparecem no anúncio (🥇🥈🥉).
+  quantidade: 3
+  # Memes que a galera posta no canal também concorrem?
+  incluir_posts_da_galera: true
+
+estoque:
+  # Pasta com memes que a própria galera sobe no repositório.
+  pasta: estoque
+  # Chance de o post sair do estoque (0.2 = 20%), se tiver meme novo lá.
+  # Se a fonte do Reddit falhar, o estoque vira o plano B automaticamente.
+  chance: 0.2
