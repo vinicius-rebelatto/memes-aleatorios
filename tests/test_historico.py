@@ -3,6 +3,7 @@ from pathlib import Path
 
 from bot.fontes import Meme
 from bot.historico import Historico
+from bot.termometro import Termometro
 
 QUANDO = datetime(2026, 11, 21, 16, 17, tzinfo=timezone(timedelta(hours=-3)))
 
@@ -26,9 +27,12 @@ def test_arquivo_inexistente_ou_vazio_vira_historico_vazio(tmp_path):
     assert Historico.carregar(vazio).memes == []
 
 
-def test_historico_inicial_do_repositorio_esta_vazio():
+def test_arquivos_de_dados_do_repositorio_sao_validos():
     raiz = Path(__file__).resolve().parent.parent
-    assert Historico.carregar(raiz / "dados" / "historico.json").memes == []
+    historico = Historico.carregar(raiz / "dados" / "historico.json")
+    assert all(registro.get("id_mensagem") and registro.get("chave") for registro in historico.memes)
+    termometro = Termometro.carregar(raiz / "dados" / "termometro.json")
+    assert 1 <= termometro.regua <= 5
 
 
 def test_registrar_salvar_e_carregar_de_novo(tmp_path):

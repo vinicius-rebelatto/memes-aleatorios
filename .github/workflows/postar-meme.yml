@@ -9,12 +9,12 @@ on:
   workflow_dispatch:
     inputs:
       simular:
-        description: "Só simular (mostra o meme escolhido, sem postar)"
+        description: "Só simular (testa as fontes e mostra o meme escolhido, sem postar)"
         type: boolean
         default: false
 
 permissions:
-  contents: write # para salvar o histórico de memes no repositório
+  contents: write # para salvar o histórico e o termômetro no repositório
 
 concurrency:
   group: postar-meme
@@ -46,16 +46,20 @@ jobs:
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
         run: python -m bot.postar
 
-      - name: Salvar histórico
-        if: ${{ !inputs.simular }}
+      - name: Salvar histórico e termômetro
+        # roda mesmo se o post falhar, para não perder os votos já contados
+        if: ${{ !cancelled() && !inputs.simular }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dados/historico.json
+          git add dados/
           if git diff --cached --quiet; then
-            echo "Nada novo no histórico."
+            echo "Nada novo para salvar."
             exit 0
           fi
           git commit -m "🤖 Meme postado"
-          git pull --rebase
-          git push
+          for tentativa in 1 2 3; do
+            git pull --rebase && git push && exit 0
+            sleep 5
+          done
+          exit 1

@@ -1,11 +1,13 @@
 from datetime import datetime, timezone
 
-from conftest import DiscordFalso, reacao
+import pytest
+from conftest import DiscordFalso, reacao, reacoes_do_bot
 
 from bot.discord_api import ErroDiscord
 from bot.fontes import Meme
 from bot.historico import Historico
 from bot.moderar import moderar
+from bot.termometro import Termometro
 from bot.util import contar_reacao, mesmo_emoji
 
 QUANDO = datetime(2026, 11, 21, tzinfo=timezone.utc)
@@ -45,6 +47,29 @@ def test_apaga_so_o_meme_do_bot_com_votos_suficientes(config, tmp_path):
     removidos = moderar(discord, config, historico, "555", log=lambda *_: None)
     assert discord.apagadas == ["1001"]
     assert removidos[0]["link"] == "https://redd.it/p0"
+
+
+def test_antes_de_apagar_os_votos_entram_no_termometro(config, tmp_path):
+    historico = historico_com_memes(tmp_path, "1001")
+    termometro = Termometro(tmp_path / "t.json")
+    discord = DiscordFalso([{"id": "1001", "reactions": reacoes_do_bot(passou_do_ponto=4, sem_graca=2)}])
+    moderar(discord, config, historico, "555", log=lambda *_: None, termometro=termometro)
+    assert discord.apagadas == ["1001"]
+    assert termometro.regua == pytest.approx(2.4)  # 4 votos 🚫 descem a régua
+    assert termometro.votos_contados["1001"]["passou_do_ponto"] == 4
+
+
+def test_usa_as_mensagens_ja_lidas_quando_recebe(config, tmp_path):
+    historico = historico_com_memes(tmp_path, "1001")
+
+    class DiscordQueNaoPodeLer(DiscordFalso):
+        def mensagens(self, *args, **kwargs):
+            raise AssertionError("não devia ler o canal de novo")
+
+    ja_lidas = [{"id": "1001", "reactions": [reacao("🚫", 3)]}]
+    discord = DiscordQueNaoPodeLer()
+    moderar(discord, config, historico, "555", log=lambda *_: None, mensagens=ja_lidas)
+    assert discord.apagadas == ["1001"]
 
 
 def test_sem_memes_no_historico_nem_consulta_o_discord(config, tmp_path):

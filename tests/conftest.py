@@ -16,13 +16,22 @@ from bot.discord_api import EPOCA_DISCORD_MS
 CONFIG_DE_TESTE = """
 fontes:
   - subreddit: eu_nvr
+    nivel: 4
     peso: 3
   - subreddit: me_irl
+    nivel: 3
     peso: 1
-votacao:
-  emoji_voto: "😂"
+reacoes:
+  engracado: "😂"
+  sem_graca: "😐"
+  mais_pesado: "🌶️"
+  passou_do_ponto: "🚫"
+termometro:
+  regua_inicial: 3
+  surpresa: 0
+nsfw:
+  permitir: true
 moderacao:
-  emoji_remover: "🚫"
   votos_para_remover: 3
 ranking:
   dias: 7
@@ -99,10 +108,11 @@ class RngFixo:
 
 
 class DiscordFalso:
-    def __init__(self, mensagens=None, bot_id="999", servidor_id="111"):
+    def __init__(self, mensagens=None, bot_id="999", servidor_id="111", canal_nsfw=False):
         self.mensagens_do_canal = list(mensagens or [])
         self.bot_id = bot_id
         self.servidor_id = servidor_id
+        self.canal_nsfw = canal_nsfw
         self.enviadas = []
         self.reacoes = []
         self.apagadas = []
@@ -110,7 +120,7 @@ class DiscordFalso:
         self.proximo_id = 5000
 
     def canal(self, canal_id):
-        return {"id": canal_id, "guild_id": self.servidor_id}
+        return {"id": canal_id, "guild_id": self.servidor_id, "nsfw": self.canal_nsfw}
 
     def eu(self):
         return {"id": self.bot_id}
@@ -136,10 +146,10 @@ class DiscordFalso:
         self.dormidas.append(segundos)
 
 
-def item_da_api(numero, ups=10, subreddit="eu_nvr", titulo=None, nsfw=False, spoiler=False, url=None):
+def item_da_api(numero, ups=10, subreddit="eu_nvr", titulo=None, nsfw=False, spoiler=False, url=None, post=None):
     """Um meme no formato que a meme-api devolve."""
     return {
-        "postLink": f"https://redd.it/post{numero}",
+        "postLink": f"https://redd.it/{post or f'post{numero}'}",
         "subreddit": subreddit,
         "title": titulo if titulo is not None else subreddit,
         "url": url or f"https://i.redd.it/imagem{numero}.png",
@@ -162,6 +172,16 @@ def snowflake(ms: int) -> str:
 
 def reacao(emoji, quantidade, do_bot=False):
     return {"emoji": {"id": None, "name": emoji}, "count": quantidade, "me": do_bot}
+
+
+def reacoes_do_bot(engracado=0, sem_graca=0, mais_pesado=0, passou_do_ponto=0):
+    """As 4 reações de um meme do bot: o número é de PESSOAS (o bot também reagiu)."""
+    return [
+        reacao("😂", engracado + 1, do_bot=True),
+        reacao("😐", sem_graca + 1, do_bot=True),
+        reacao("🌶️", mais_pesado + 1, do_bot=True),
+        reacao("🚫", passou_do_ponto + 1, do_bot=True),
+    ]
 
 
 @pytest.fixture

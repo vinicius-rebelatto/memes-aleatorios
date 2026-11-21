@@ -2,25 +2,50 @@
 # Depois de editar, é só salvar (commit): o próximo post já usa a configuração nova.
 # Os HORÁRIOS ficam nos arquivos da pasta .github/workflows (veja o README).
 
-# De onde vêm os memes. Cada fonte é um subreddit.
-# Quanto maior o peso, mais vezes a fonte é sorteada.
-# A cada post, o bot pega os memes recentes da fonte sorteada e posta o mais
-# votado que ainda não saiu no canal (é assim que aparece o "meme do momento").
+# De onde vêm os memes. Cada fonte é um subreddit com um NÍVEL de peso:
+#   1 = bem leve ... 5 = pesado
+# O bot prefere as fontes com nível perto da régua (que a galera move com 🌶️ e 🚫)
+# e as que levam mais 😂. O "peso" (opcional, padrão 1) dá um empurrão fixo:
+# aqui as fontes brasileiras começam com peso 2.
 fontes:
-  - subreddit: eu_nvr
-    peso: 3
+  - subreddit: wholesomememes
+    nivel: 1
   - subreddit: DiretoDoZapZap
+    nivel: 2
+    peso: 2
+  - subreddit: HUEstation
+    nivel: 3
     peso: 2
   - subreddit: me_irl
-    peso: 1
+    nivel: 3
+  - subreddit: eu_nvr
+    nivel: 4
+    peso: 2
+  - subreddit: dankmemes
+    nivel: 5
 
-votacao:
-  # Reação que a galera usa para votar no Meme da Semana.
-  emoji_voto: "😂"
+# As 4 reações que o bot coloca em cada meme.
+reacoes:
+  engracado: "😂" # vale voto no Meme da Semana e faz a fonte aparecer mais
+  sem_graca: "😐" # faz a fonte aparecer menos
+  mais_pesado: "🌶️" # sobe a régua
+  passou_do_ponto: "🚫" # desce a régua (e com votos suficientes apaga o meme)
+
+termometro:
+  # Onde a régua começa: 1 = leve ... 5 = pesado. Só vale antes dos primeiros votos;
+  # depois quem manda é a galera (o valor atual fica em dados/termometro.json).
+  regua_inicial: 3
+  # Chance de um post ignorar a régua e sortear qualquer fonte (0.2 = 20%).
+  # Serve para o algoritmo não ficar viciado e perceber quando o gosto muda.
+  surpresa: 0.2
+
+nsfw:
+  # Memes marcados como NSFW no Reddit podem sair, contando como +1 de peso na régua.
+  # Só vale se o canal estiver marcado como "restrito por idade" no Discord (regra
+  # do Discord para conteúdo adulto). Sem essa marcação, NSFW fica de fora.
+  permitir: true
 
 moderacao:
-  # Reação que significa "esse passou do ponto".
-  emoji_remover: "🚫"
   # Quantas pessoas precisam marcar 🚫 para o bot apagar o meme.
   votos_para_remover: 3
 
@@ -36,5 +61,5 @@ estoque:
   # Pasta com memes que a própria galera sobe no repositório.
   pasta: estoque
   # Chance de o post sair do estoque (0.2 = 20%), se tiver meme novo lá.
-  # Se a fonte do Reddit falhar, o estoque vira o plano B automaticamente.
+  # Se o Reddit falhar, o estoque vira o plano B automaticamente.
   chance: 0.2

@@ -5,18 +5,32 @@ from bot.config import ErroDeConfiguracao, SegredosAusentes, carregar_config, le
 
 def test_config_do_repositorio_carrega():
     config = carregar_config()
-    assert [fonte.subreddit for fonte in config.fontes] == ["eu_nvr", "DiretoDoZapZap", "me_irl"]
+    niveis = {fonte.subreddit: fonte.nivel for fonte in config.fontes}
+    assert niveis == {
+        "wholesomememes": 1,
+        "DiretoDoZapZap": 2,
+        "HUEstation": 3,
+        "me_irl": 3,
+        "eu_nvr": 4,
+        "dankmemes": 5,
+    }
+    assert config.reacoes.em_ordem() == ("😂", "😐", "🌶️", "🚫")
+    assert config.regua_inicial == 3
+    assert config.permitir_nsfw is True
     assert config.votos_para_remover == 3
     assert config.estoque_pasta.name == "estoque"
     assert config.historico.name == "historico.json"
+    assert config.termometro.name == "termometro.json"
 
 
 def test_fontes_aceitam_texto_simples_e_prefixo_r(tmp_path):
     caminho = tmp_path / "config.yml"
-    caminho.write_text("fontes:\n  - r/memes\n  - subreddit: eu_nvr\n    peso: 2\n", encoding="utf-8")
+    caminho.write_text("fontes:\n  - r/memes\n  - subreddit: eu_nvr\n    peso: 2\n    nivel: 4\n", encoding="utf-8")
     config = carregar_config(caminho)
-    assert [(f.subreddit, f.peso) for f in config.fontes] == [("memes", 1.0), ("eu_nvr", 2.0)]
-    assert config.estoque_chance == 0.2  # valor padrão
+    assert [(f.subreddit, f.nivel, f.peso) for f in config.fontes] == [("memes", 3.0, 1.0), ("eu_nvr", 4.0, 2.0)]
+    assert config.estoque_chance == 0.2  # valores padrão
+    assert config.surpresa == 0.2
+    assert config.reacoes.mais_pesado == "🌶️"
 
 
 @pytest.mark.parametrize(
@@ -27,6 +41,11 @@ def test_fontes_aceitam_texto_simples_e_prefixo_r(tmp_path):
         "fontes:\n  - memes\nestoque:\n  chance: 5\n",
         "fontes:\n  - memes\nmoderacao:\n  votos_para_remover: zero\n",
         "fontes: [memes\n",
+        "fontes:\n  - subreddit: memes\n    nivel: 6\n",
+        "fontes:\n  - memes\ntermometro:\n  regua_inicial: 0\n",
+        "fontes:\n  - memes\ntermometro:\n  surpresa: 2\n",
+        'fontes:\n  - memes\nreacoes:\n  engracado: "😂"\n  sem_graca: "😂"\n',
+        'fontes:\n  - memes\nreacoes:\n  mais_pesado: ""\n',
     ],
 )
 def test_config_invalida_explica_o_erro(tmp_path, conteudo):

@@ -5,6 +5,7 @@ from conftest import reacao
 from bot.fontes import Meme
 from bot.historico import Historico
 from bot.ranking import calcular_ranking, montar_anuncio
+from bot.termometro import Termometro
 
 BRT = timezone(timedelta(hours=-3))
 FIM = datetime(2026, 11, 29, 21, 7, tzinfo=BRT)
@@ -90,5 +91,25 @@ def test_vencedor_do_estoque_vai_como_arquivo(tmp_path):
 
 def test_semana_sem_votos_ganha_um_aviso(tmp_path):
     corpo, anexo = montar_anuncio([], "111", "555", "😂", INICIO, FIM, tmp_path)
-    assert "Ninguém votou" in corpo["content"]
+    embed = corpo["embeds"][0]
+    assert "Ninguém votou" in embed["description"]
+    assert "image" not in embed and "fields" not in embed
     assert anexo is None
+
+
+def test_anuncio_mostra_o_termometro_da_semana(tmp_path):
+    evolucao = [
+        {"quando": "2026-11-20T11:17:00-03:00", "regua": 3.0},
+        {"quando": "2026-11-28T21:17:00-03:00", "regua": 3.45},
+    ]
+    termometro = Termometro(
+        tmp_path / "t.json", regua=3.45, afinidade={"HUEstation": 1.25, "dankmemes": -0.5}, evolucao=evolucao
+    )
+    corpo, _ = montar_anuncio([], "111", "555", "😂", INICIO, FIM, tmp_path, termometro)
+    campo = corpo["embeds"][0]["fields"][0]
+    assert campo["name"] == "🌡️ Termômetro da galera"
+    assert campo["value"].splitlines() == [
+        "Régua: **3,5/5 🟩🟩🟨⬜⬜** (🌶️ subiu 0,5 na semana)",
+        "Em alta: r/HUEstation",
+        "Em baixa: r/dankmemes",
+    ]

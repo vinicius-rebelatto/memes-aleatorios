@@ -59,6 +59,8 @@ class Historico:
             "imagem": meme.imagem,
             "arquivo": meme.arquivo.name if meme.arquivo else "",
             "votos_reddit": meme.votos_reddit if meme.fonte == "reddit" else None,
+            "nivel": meme.nivel,
+            "nsfw": True if meme.nsfw else None,
             "postado_em": quando.isoformat(timespec="seconds"),
         }
         registro = {chave: valor for chave, valor in registro.items() if valor not in (None, "")}
