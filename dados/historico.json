@@ -1,3 +1,15 @@
 {
-  "memes": []
+  "memes": [
+    {
+      "id_mensagem": "1573769974076678275",
+      "fonte": "reddit",
+      "chave": "https://redd.it/yhgfd4",
+      "subreddit": "eu_nvr",
+      "titulo": "eu_nvr",
+      "link": "https://redd.it/yhgfd4",
+      "imagem": "https://i.redd.it/t20djbawjyw91.png",
+      "votos_reddit": 2978,
+      "postado_em": "2026-11-21T15:40:05-03:00"
+    }
+  ]
 }
