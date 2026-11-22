@@ -34,6 +34,18 @@
       "votos_reddit": 348,
       "nivel": 3.0,
       "postado_em": "2026-11-21T20:48:11-03:00"
+    },
+    {
+      "id_mensagem": "1573952873484648449",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1y1x8tm",
+      "subreddit": "me_irl",
+      "titulo": "me_irl",
+      "link": "https://redd.it/1y1x8tm",
+      "imagem": "https://i.redd.it/kfv0gnj0yy2i1.png",
+      "votos_reddit": 33688,
+      "nivel": 3.0,
+      "postado_em": "2026-11-22T03:46:49-03:00"
     }
   ]
 }
