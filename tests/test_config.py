@@ -20,7 +20,7 @@ def test_config_do_repositorio_carrega():
     assert config.tolerancia == timedelta(hours=2)
     assert (config.ranking_dia, config.ranking_horario) == (6, time(21))
     assert config.reacoes.em_ordem() == ("😂", "😐", "🌶️", "🚫")
-    assert config.regua_inicial == 3
+    assert config.regua_inicial == 4
     assert config.permitir_nsfw is True
     assert config.votos_para_remover == 3
     assert config.estoque_pasta.name == "estoque"
