@@ -68,3 +68,18 @@ def test_salvar_mantem_acentos_e_emojis_legiveis(tmp_path):
     historico.registrar(meme, "1", QUANDO)
     historico.salvar()
     assert "Ação 😂" in caminho.read_text(encoding="utf-8")
+
+
+def test_postou_desde_e_registro_do_meme_da_semana(tmp_path):
+    caminho = tmp_path / "h.json"
+    historico = Historico(caminho)
+    historico.registrar(meme_do_reddit(1), "1", QUANDO)  # 16h17
+    assert historico.postou_desde(QUANDO - timedelta(hours=1))
+    assert not historico.postou_desde(QUANDO + timedelta(minutes=1))
+    assert historico.ultimo_ranking() is None
+
+    historico.registrar_ranking("99", QUANDO)
+    historico.salvar()
+    de_novo = Historico.carregar(caminho)
+    assert de_novo.ultimo_ranking() == QUANDO.date()
+    assert de_novo.rankings == [{"id_mensagem": "99", "postado_em": "2026-11-21T16:17:00-03:00"}]

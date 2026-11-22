@@ -1,23 +1,32 @@
-"""Histórico dos memes já postados (dados/historico.json).
+"""Histórico do que o bot já postou (dados/historico.json).
 
-O GitHub Actions salva este arquivo no repositório depois de cada post. É ele que
-impede o bot de repetir meme e que liga cada mensagem do Discord ao meme original.
+O GitHub Actions salva este arquivo no repositório. É ele que impede o bot de repetir
+meme, de postar duas vezes no mesmo horário e de anunciar o Meme da Semana duas vezes,
+e que liga cada mensagem do Discord ao meme original.
 """
 
 from __future__ import annotations
 
 import json
 import os
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from .fontes import Meme
 
 
+def _ler_data(texto: str | None) -> datetime | None:
+    try:
+        return datetime.fromisoformat(texto) if texto else None
+    except ValueError:
+        return None
+
+
 class Historico:
-    def __init__(self, caminho: Path, memes: list[dict] | None = None):
+    def __init__(self, caminho: Path, memes: list[dict] | None = None, rankings: list[dict] | None = None):
         self.caminho = Path(caminho)
         self.memes: list[dict] = []
+        self.rankings: list[dict] = list(rankings or [])
         self._chaves: set[str] = set()
         self._imagens: set[str] = set()
         self._por_mensagem: dict[str, dict] = {}
@@ -31,8 +40,11 @@ class Historico:
             return cls(caminho)
         texto = caminho.read_text(encoding="utf-8").strip()
         dados = json.loads(texto) if texto else {}
-        memes = dados.get("memes", []) if isinstance(dados, dict) else []
-        return cls(caminho, [m for m in memes if isinstance(m, dict)])
+        if not isinstance(dados, dict):
+            dados = {}
+        memes = [m for m in dados.get("memes", []) if isinstance(m, dict)]
+        rankings = [r for r in dados.get("rankings", []) if isinstance(r, dict)]
+        return cls(caminho, memes, rankings)
 
     def _indexar(self, registro: dict) -> None:
         self.memes.append(registro)
@@ -47,6 +59,10 @@ class Historico:
         if meme.chave in self._chaves:
             return True
         return bool(meme.imagem) and meme.imagem in self._imagens
+
+    def postou_desde(self, momento: datetime) -> bool:
+        """Já saiu algum meme a partir de `momento`?"""
+        return any((quando := _ler_data(m.get("postado_em"))) and quando >= momento for m in self.memes)
 
     def registrar(self, meme: Meme, id_mensagem: str, quando: datetime) -> dict:
         registro = {
@@ -67,6 +83,14 @@ class Historico:
         self._indexar(registro)
         return registro
 
+    def registrar_ranking(self, id_mensagem: str, quando: datetime) -> None:
+        self.rankings.append({"id_mensagem": str(id_mensagem), "postado_em": quando.isoformat(timespec="seconds")})
+
+    def ultimo_ranking(self) -> date | None:
+        """Dia (no horário de Brasília) em que saiu o último Meme da Semana."""
+        datas = [quando.date() for r in self.rankings if (quando := _ler_data(r.get("postado_em")))]
+        return max(datas) if datas else None
+
     def por_mensagem(self, id_mensagem: str) -> dict | None:
         return self._por_mensagem.get(str(id_mensagem))
 
@@ -76,6 +100,6 @@ class Historico:
     def salvar(self) -> None:
         self.caminho.parent.mkdir(parents=True, exist_ok=True)
         temporario = self.caminho.with_suffix(".tmp")
-        conteudo = json.dumps({"memes": self.memes}, ensure_ascii=False, indent=2) + "\n"
-        temporario.write_text(conteudo, encoding="utf-8")
+        dados = {"memes": self.memes, "rankings": self.rankings}
+        temporario.write_text(json.dumps(dados, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         os.replace(temporario, self.caminho)

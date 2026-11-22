@@ -1,19 +1,16 @@
 """Apaga os memes do bot que a galera marcou como "passou do ponto" (🚫).
 
-Roda sozinho de hora em hora e também antes de cada post. Antes de apagar, conta os
-votos do meme no termômetro, para a régua não perder os 🚫 que levaram à remoção.
-Uso manual: python -m bot.moderar
+Roda toda vez que o bot acorda (de hora em hora). Antes de apagar, conta os votos do
+meme no termômetro, para a régua não perder os 🚫 que levaram à remoção.
 """
 
 from __future__ import annotations
 
-import sys
-
-from .config import Config, ErroDeConfiguracao, SegredosAusentes, carregar_config, ler_segredos
+from .config import Config
 from .discord_api import Discord, ErroDiscord
 from .historico import Historico
 from .termometro import Termometro
-from .util import contar_reacao, escrever_resumo
+from .util import contar_reacao
 
 
 def moderar(
@@ -52,40 +49,3 @@ def moderar(
         log(f"{emoji} Meme removido pela galera ({votos} votos): {origem}")
         removidos.append(registro)
     return removidos
-
-
-def main() -> int:
-    try:
-        config = carregar_config()
-        token, canal_id = ler_segredos()
-    except SegredosAusentes as aviso:
-        print(f"⚠️ {aviso}")
-        escrever_resumo(f"⚠️ {aviso}")
-        return 0
-    except ErroDeConfiguracao as erro:
-        print(f"❌ {erro}")
-        return 1
-
-    historico = Historico.carregar(config.historico)
-    if not historico.ids_de_mensagens():
-        print("ℹ️ Nenhum meme postado ainda, nada para moderar.")
-        return 0
-    termometro = Termometro.carregar(config.termometro, config.regua_inicial)
-    try:
-        removidos = moderar(Discord(token), config, historico, canal_id, termometro=termometro)
-    except ErroDiscord as erro:
-        print(f"❌ {erro}")
-        escrever_resumo(f"❌ {erro}")
-        return 1
-
-    if removidos:
-        termometro.salvar()
-        print(f"🌡️ Régua agora: {termometro.descrever_regua()}")
-        escrever_resumo(f"### {config.reacoes.passou_do_ponto} {len(removidos)} meme(s) removido(s) pela galera")
-    else:
-        print("✅ Nenhum meme passou do ponto.")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())

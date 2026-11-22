@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta, timezone
 
-from conftest import reacao
+from conftest import DiscordFalso, reacao
 
 from bot.fontes import Meme
 from bot.historico import Historico
-from bot.ranking import calcular_ranking, montar_anuncio
+from bot.ranking import anunciar, calcular_ranking, montar_anuncio
 from bot.termometro import Termometro
 
 BRT = timezone(timedelta(hours=-3))
@@ -113,3 +113,12 @@ def test_anuncio_mostra_o_termometro_da_semana(tmp_path):
         "Em alta: r/HUEstation",
         "Em baixa: r/dankmemes",
     ]
+
+
+def test_anunciar_posta_e_registra_no_historico(config, tmp_path):
+    historico = preparar_historico(tmp_path)
+    discord = DiscordFalso(mensagens_da_semana(), bot_id=BOT)
+    colocados = anunciar(discord, config, historico, Termometro(tmp_path / "t.json"), "555", FIM, log=lambda *_: None)
+    assert [c.mensagem_id for c in colocados] == ["1001", "2001", "1002"]
+    assert discord.enviadas[0]["corpo"]["embeds"][0]["title"] == "🏆 Meme da Semana"
+    assert historico.ultimo_ranking() == FIM.date()

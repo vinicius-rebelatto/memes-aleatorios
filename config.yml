@@ -1,27 +1,30 @@
 # Configuração do bot de memes.
-# Depois de editar, é só salvar (commit): o próximo post já usa a configuração nova.
-# Os HORÁRIOS ficam nos arquivos da pasta .github/workflows (veja o README).
+# Depois de editar, é só salvar (commit): a próxima execução já usa a configuração nova.
 
-# De onde vêm os memes. Cada fonte é um subreddit com um NÍVEL de peso:
+# Horários dos memes (horário de Brasília). Use aspas.
+# O bot acorda de hora em hora e só posta quando está dentro da janela de um horário
+# e o meme daquele horário ainda não saiu. Se ele acordar atrasado mais que a
+# tolerância, pula aquele horário em vez de postar fora de hora.
+agenda:
+  horarios: ["09:00", "12:00", "15:00", "18:00", "21:00"]
+  tolerancia_minutos: 120
+
+# De onde vêm os memes: subreddits brasileiros, cada um com um NÍVEL de peso
 #   1 = bem leve ... 5 = pesado
 # O bot prefere as fontes com nível perto da régua (que a galera move com 🌶️ e 🚫)
-# e as que levam mais 😂. O "peso" (opcional, padrão 1) dá um empurrão fixo:
-# aqui as fontes brasileiras começam com peso 2.
+# e as que levam mais 😂. O "peso" (opcional, padrão 1) dá um empurrão fixo.
 fontes:
-  - subreddit: wholesomememes
-    nivel: 1
   - subreddit: DiretoDoZapZap
     nivel: 2
-    peso: 2
+  - subreddit: MemesBR
+    nivel: 2
   - subreddit: HUEstation
     nivel: 3
-    peso: 2
-  - subreddit: me_irl
-    nivel: 3
   - subreddit: eu_nvr
+    nivel: 3
+  - subreddit: ShitpostBR
     nivel: 4
-    peso: 2
-  - subreddit: dankmemes
+  - subreddit: circojeca
     nivel: 5
 
 # As 4 reações que o bot coloca em cada meme.
@@ -50,7 +53,10 @@ moderacao:
   votos_para_remover: 3
 
 ranking:
-  # Quantos dias para trás a votação do Meme da Semana considera.
+  # Quando sai o Meme da Semana (horário de Brasília).
+  dia: domingo
+  horario: "21:00"
+  # Quantos dias para trás a votação considera.
   dias: 7
   # Quantas posições aparecem no anúncio (🥇🥈🥉).
   quantidade: 3

@@ -23,7 +23,7 @@ LIMITE_DE_UPLOAD = 10 * 1024 * 1024  # 10 MB: limite do Discord em servidor sem 
 # comparando o ID dele com o do post mais novo da mesma busca.
 IDS_POR_DIA = 1_450_000  # quantos posts o Reddit inteiro recebe por dia (aproximado)
 MEIA_VIDA_DIAS = 3  # a cada 3 dias de idade, o meme passa a valer metade
-IDADE_MAXIMA_DIAS = 30  # mais velho que isso não é "meme do momento"
+IDADE_MAXIMA_DIAS = 60  # mais velho que isso não entra (os subs brasileiros são mais lentos)
 
 
 class ErroDeFonte(Exception):

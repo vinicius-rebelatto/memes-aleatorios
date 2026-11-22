@@ -1,22 +1,21 @@
 """Meme da Semana: conta os votos (😂) dos últimos dias, anuncia o pódio e mostra o termômetro.
 
-Roda sozinho no domingo à noite.
-Uso manual: python -m bot.ranking
+Sai sozinho no dia e hora do config.yml (domingo às 21h). Para anunciar na hora:
+python -m bot.postar --modo ranking
 """
 
 from __future__ import annotations
 
 import mimetypes
-import sys
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from .config import ErroDeConfiguracao, SegredosAusentes, carregar_config, ler_segredos
-from .discord_api import Discord, ErroDiscord, link_da_mensagem
+from .config import Config
+from .discord_api import Discord, link_da_mensagem
 from .historico import Historico
 from .termometro import Termometro, numero_br
-from .util import agora, contar_reacao, escrever_resumo
+from .util import contar_reacao
 
 MEDALHAS = ("🥇", "🥈", "🥉")
 TIPOS_NORMAIS = (0, 19)  # 0 = mensagem comum, 19 = resposta a outra mensagem
@@ -131,56 +130,38 @@ def montar_anuncio(
     return corpo, anexo
 
 
-def main() -> int:
-    try:
-        config = carregar_config()
-        token, canal_id = ler_segredos()
-    except SegredosAusentes as aviso:
-        print(f"⚠️ {aviso}")
-        escrever_resumo(f"⚠️ {aviso}")
-        return 0
-    except ErroDeConfiguracao as erro:
-        print(f"❌ {erro}")
-        return 1
-
-    discord = Discord(token)
-    historico = Historico.carregar(config.historico)
-    termometro = Termometro.carregar(config.termometro, config.regua_inicial)
+def anunciar(
+    discord: Discord,
+    config: Config,
+    historico: Historico,
+    termometro: Termometro,
+    canal_id: str,
+    quando: datetime,
+    log=print,
+) -> list[Colocado]:
+    """Conta os votos dos últimos dias, posta o anúncio e registra no histórico."""
     emoji = config.reacoes.engracado
-    fim = agora()
-    inicio = fim - timedelta(days=config.ranking_dias)
-    try:
-        canal = discord.canal(canal_id)
-        bot_id = discord.eu()["id"]
-        mensagens = discord.mensagens_desde(canal_id, int(inicio.timestamp() * 1000))
-        colocados = calcular_ranking(
-            mensagens, bot_id, historico, emoji, config.ranking_incluir_galera, config.ranking_quantidade
-        )
-        corpo, anexo = montar_anuncio(
-            colocados,
-            str(canal.get("guild_id", "@me")),
-            canal_id,
-            emoji,
-            inicio,
-            fim,
-            config.estoque_pasta,
-            termometro,
-        )
-        discord.enviar(canal_id, corpo, anexo)
-    except ErroDiscord as erro:
-        print(f"❌ {erro}")
-        escrever_resumo(f"❌ {erro}")
-        return 1
-
+    inicio = quando - timedelta(days=config.ranking_dias)
+    canal = discord.canal(canal_id)
+    bot_id = discord.eu()["id"]
+    mensagens = discord.mensagens_desde(canal_id, int(inicio.timestamp() * 1000))
+    colocados = calcular_ranking(
+        mensagens, bot_id, historico, emoji, config.ranking_incluir_galera, config.ranking_quantidade
+    )
+    corpo, anexo = montar_anuncio(
+        colocados,
+        str(canal.get("guild_id", "@me")),
+        canal_id,
+        emoji,
+        inicio,
+        quando,
+        config.estoque_pasta,
+        termometro,
+    )
+    mensagem = discord.enviar(canal_id, corpo, anexo)
+    historico.registrar_ranking(mensagem["id"], quando)
     if colocados:
-        vencedor = colocados[0]
-        print(f"🏆 Meme da Semana anunciado: {descrever(vencedor)} com {vencedor.votos} voto(s).")
-        escrever_resumo(f"### 🏆 Meme da Semana\n{descrever(vencedor)} venceu com {vencedor.votos} voto(s).")
+        log(f"🏆 Meme da Semana anunciado: {descrever(colocados[0])} com {colocados[0].votos} voto(s).")
     else:
-        print("ℹ️ Ninguém votou essa semana; anúncio enviado mesmo assim.")
-    print(f"🌡️ Régua: {termometro.descrever_regua()}")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+        log("🏆 Meme da Semana anunciado (ninguém votou essa semana).")
+    return colocados

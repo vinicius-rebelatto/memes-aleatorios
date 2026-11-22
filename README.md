@@ -1,12 +1,12 @@
 # 🤖 Memes Aleatórios
 
-Automação que posta memes no canal `#memes-aleatorios` do nosso Discord, com votação, **Meme da Semana** e um
-**algoritmo da galera**: as reações de todo mundo decidem que tipo de meme vem depois.
+Automação que posta **memes brasileiros** no canal `#memes-aleatorios` do nosso Discord, com votação,
+**Meme da Semana** e um **algoritmo da galera**: as reações de todo mundo decidem que tipo de meme vem depois.
 Roda de graça no GitHub Actions: não tem servidor, nem nada ligado o tempo todo.
 
 ## Como funciona
 
-**3 vezes por dia** (11h17, 16h17 e 21h17) o bot posta um meme, e cada meme chega com 4 reações:
+**5 memes por dia, de 3 em 3 horas: 9h, 12h, 15h, 18h e 21h** (horário de Brasília). Cada meme chega com 4 reações:
 
 | Reação | Significa         | O que muda                                                     |
 | ------ | ----------------- | -------------------------------------------------------------- |
@@ -15,22 +15,23 @@ Roda de graça no GitHub Actions: não tem servidor, nem nada ligado o tempo tod
 | 🌶️     | quero mais pesado | a régua sobe                                                   |
 | 🚫     | passou do ponto   | a régua desce, e com **3 pessoas** marcando o bot apaga o meme |
 
-- **Domingo às 21h07** sai o 🏆 **Meme da Semana** com o pódio e o 🌡️ termômetro da galera. Memes que a galera
+- **Domingo às 21h** sai o 🏆 **Meme da Semana** com o pódio e o 🌡️ termômetro da galera. Memes que a galera
   posta no canal também concorrem.
-- O bot confere os 🚫 de hora em hora, então meme que passou do ponto não fica muito tempo no ar.
+- O bot **acorda de hora em hora**: confere os 🚫, apaga o que passou do ponto e, se for um dos horários, posta.
+  Ele mesmo confere a hora, então **nunca posta de madrugada nem posta dois memes no mesmo horário**, mesmo que
+  seja acordado atrasado ou mais de uma vez.
 - De vez em quando (20%) ele posta do [estoque da galera](#-estoque-da-galera).
 
 ### 🌡️ O algoritmo da galera
 
-Cada fonte de memes (um subreddit) tem um **nível de peso**, de 1 (leve) a 5 (pesado):
+Cada fonte de memes (um subreddit brasileiro) tem um **nível de peso**, de 1 (leve) a 5 (pesado):
 
-| Nível | Fontes                        |
-| ----- | ----------------------------- |
-| 1     | r/wholesomememes              |
-| 2     | r/DiretoDoZapZap              |
-| 3     | r/HUEstation, r/me_irl        |
-| 4     | r/eu_nvr                      |
-| 5     | r/dankmemes                   |
+| Nível | Fontes                           |
+| ----- | -------------------------------- |
+| 2     | r/DiretoDoZapZap, r/MemesBR      |
+| 3     | r/HUEstation, r/eu_nvr           |
+| 4     | r/ShitpostBR                     |
+| 5     | r/circojeca                      |
 
 - A **régua** começa no meio (3). Cada 🌶️ empurra ela um pouco pra cima e cada 🚫, pra baixo.
 - Na hora de escolher, o bot prefere as fontes com nível **perto da régua** e com mais 😂 do que 😐.
@@ -50,7 +51,7 @@ restrito por idade, então o bot **só posta NSFW se o canal estiver marcado ass
 **Editar canal → Visão geral → Canal com restrição de idade**. Quem abrir o canal vai precisar confirmar que
 tem 18 anos ou mais. Sem essa marcação, o bot simplesmente deixa os NSFW de fora.
 
-## Instalação (uma vez só, uns 10 minutos)
+## Instalação (uma vez só)
 
 ### 1. Criar o bot no Discord
 
@@ -89,41 +90,63 @@ Neste repositório: **Settings → Secrets and variables → Actions → New rep
 
 ### 5. Testar
 
-Aba **Actions → Postar meme → Run workflow → Run workflow**. Em um minuto o meme aparece no canal. ✅
+Aba **Actions → Postar meme → Run workflow**, deixe o modo em **agora** e clique em **Run workflow**.
+Em um minuto o meme aparece no canal. ✅
 
-Pronto: daqui para frente é tudo automático. Para testar o Meme da Semana na hora, rode **Meme da Semana** do
-mesmo jeito.
+Os outros modos do botão: **agenda** (só posta se for horário), **ranking** (anuncia o Meme da Semana na hora)
+e **simular** (testa todas as fontes e mostra no log qual meme seria postado, sem postar nada).
 
-> 💡 Marcando **"Só simular"** antes de rodar o **Postar meme**, ele testa todas as fontes e mostra no log qual
-> meme seria postado, sem postar nada.
+### 6. Relógio externo para os horários certinhos (recomendado)
+
+O agendador do próprio GitHub anda atrasando execuções em **horas** e às vezes nem roda. O bot já se protege
+disso (nunca posta fora de hora), mas para os memes saírem **na hora certa** vale colocar um relógio externo
+gratuito, o [cron-job.org](https://cron-job.org), para acordar o bot de hora em hora. Leva uns 5 minutos.
+
+**a) Criar um token só para acordar o bot.** No GitHub: sua foto → **Settings → Developer settings →
+Personal access tokens → Fine-grained tokens → Generate new token**.
+
+- **Token name:** `relogio-memes`
+- **Expiration:** 1 ano (anote para renovar)
+- **Repository access:** *Only select repositories* → `memes-aleatorios`
+- **Permissions → Repository permissions → Actions:** *Read and write* (só essa)
+
+Gere e copie o token. Ele só consegue disparar os workflows deste repositório e mais nada.
+
+**b) Criar o relógio no cron-job.org.** Crie uma conta grátis e clique em **Create cronjob**:
+
+- **URL:** `https://api.github.com/repos/vinicius-rebelatto/memes-aleatorios/actions/workflows/postar-meme.yml/dispatches`
+- **Execution schedule:** a cada hora, no minuto 0 (fuso `America/Sao_Paulo`)
+- Na aba **Advanced**:
+  - **Request method:** `POST`
+  - **Headers:**
+    - `Accept`: `application/vnd.github+json`
+    - `Authorization`: `Bearer COLE_O_TOKEN_AQUI`
+    - `Content-Type`: `application/json`
+  - **Request body:** `{"ref":"main","inputs":{"modo":"agenda"}}`
+
+Salve e use **Test run**: a resposta deve ser `204` e uma execução nova aparece na aba **Actions**. Pronto:
+o bot passa a acordar pontualmente. O agendamento do GitHub continua lá como reserva.
 
 ## Personalizar
 
 | Quero mudar...                              | Onde                                                  |
 | ------------------------------------------- | ----------------------------------------------------- |
+| Horários dos memes                          | `config.yml` → `agenda.horarios`                      |
+| Dia e hora do Meme da Semana                | `config.yml` → `ranking.dia` e `ranking.horario`      |
 | Fontes, o nível de cada uma e o peso        | `config.yml` → `fontes`                               |
 | Os emojis das 4 reações                     | `config.yml` → `reacoes`                              |
 | Onde a régua começa e a chance de surpresa  | `config.yml` → `termometro`                           |
 | Liberar ou bloquear NSFW                    | `config.yml` → `nsfw.permitir`                        |
 | Quantos 🚫 apagam um meme                   | `config.yml` → `moderacao.votos_para_remover`         |
 | Chance de postar do estoque                 | `config.yml` → `estoque.chance`                       |
-| Horários dos posts                          | `.github/workflows/postar-meme.yml` → `cron`          |
-| Dia e hora do Meme da Semana                | `.github/workflows/meme-da-semana.yml` → `cron`       |
 
-Dá para editar direto pelo site do GitHub (ícone de lápis no arquivo → **Commit changes**).
+Dá para editar direto pelo site do GitHub (ícone de lápis no arquivo → **Commit changes**). Como o bot
+acorda de hora em hora, os horários podem ser qualquer hora cheia ou quebrada (ex.: `"19:30"`); o bot posta
+na primeira acordada dentro da janela de cada horário.
 
-**Quer ir além do nível 5?** A régua só vai até a fonte mais pesada da lista: para memes mais pesados, adicione
-fontes novas com nível 5 em `config.yml`. Rode o **Postar meme** com **"Só simular"** para ver se a fonte nova
-funciona.
-
-**Sobre os horários:** `cron: "17 11,16,21 * * *"` quer dizer "no minuto 17 das 11h, 16h e 21h, todo dia", e a
-linha `timezone` mantém tudo no horário de Brasília. Exemplos:
-
-- 4 posts por dia: `"17 10,14,18,22 * * *"`
-- 2 posts por dia: `"17 12,20 * * *"`
-- Meme da Semana na sexta às 18h: `"7 18 * * 5"` (0 = domingo, 1 = segunda, …, 6 = sábado)
-
-O GitHub às vezes atrasa alguns minutos (em horário de pico, até meia hora). É normal.
+**Quer memes mais pesados ou mais leves do que a lista permite?** A régua só vai até as fontes da lista:
+adicione fontes novas com o nível certo em `config.yml` e rode o **Postar meme** no modo **simular** para ver
+se a fonte nova funciona.
 
 ## 📦 Estoque da galera
 
@@ -136,40 +159,43 @@ A pasta [`estoque/`](estoque/) guarda memes que a própria galera sobe. Para sub
 
 ## Problemas comuns
 
-O resultado de cada execução aparece na aba **Actions** (clique na execução para ver o log).
+O resultado de cada execução aparece na aba **Actions** (clique na execução para ver o resumo).
 
-| Mensagem no log                                  | O que fazer                                                                                     |
+| Mensagem                                         | O que fazer                                                                                     |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| ⏰ Fora do horário de posts / ✅ O meme das 12h já saiu | Normal: o bot acordou, moderou e não era hora de postar.                                  |
 | ⚠️ secrets ainda não foram configurados          | Faça o passo 4.                                                                                 |
 | ❌ O token foi recusado                          | Gere outro token (passo 1) e atualize o secret `DISCORD_TOKEN`.                                 |
 | ❌ O bot não consegue ver o canal / Falta permissão | Convide de novo com o link do passo 2. Se o canal ou a categoria for restrito, libere o cargo do bot nele. |
 | ❌ Canal não encontrado                          | O `DISCORD_CHANNEL_ID` está errado: copie o ID de novo (passo 3).                               |
 | ❌ Não achei nenhum meme novo                    | A meme-api pode estar fora do ar. Se continuar, adicione outra fonte ou memes no estoque.       |
 | ℹ️ NSFW fica de fora                             | Normal: o canal não está marcado como restrito por idade (veja [NSFW](#-nsfw)).                 |
+| cron-job.org mostra erro `401`, `403` ou `404`   | Token errado, sem a permissão *Actions: Read and write*, vencido, ou URL digitada errada.        |
 
 Também é normal:
 
 - **O bot aparece offline** na lista de membros. Ele só "acorda" para postar.
-- **Commits "🤖 Meme postado"** no histórico do repositório. É o bot salvando o que já postou e o termômetro.
+- **Commits "🤖 Bot de memes"** no histórico do repositório. É o bot salvando o que já postou e o termômetro.
 
 ## Rodar no computador (opcional)
 
 ```bash
 pip install -r requirements-dev.txt
-python -m bot.postar --simular   # testa as fontes e mostra o próximo meme, sem mexer no Discord
-python -m pytest                 # roda os testes
+python -m bot.postar --modo simular   # testa as fontes e mostra o próximo meme, sem mexer no Discord
+python -m pytest                      # roda os testes
 ```
 
 ## Como o código está organizado
 
 | Arquivo                | O que faz                                                                    |
 | ---------------------- | ---------------------------------------------------------------------------- |
-| `bot/postar.py`        | Lê as reações, atualiza o termômetro, escolhe, posta e salva                 |
+| `bot/postar.py`        | O bot: lê as reações, modera, posta se for hora e anuncia o Meme da Semana   |
+| `bot/agenda.py`        | Os horários: janela de cada post e dia do Meme da Semana                     |
 | `bot/termometro.py`    | O algoritmo da galera: régua de peso e afinidade de cada fonte               |
 | `bot/fontes.py`        | Busca memes na [meme-api](https://github.com/D3vd/Meme_Api) e no estoque e escolhe o melhor |
 | `bot/moderar.py`       | Apaga os memes do bot que levaram 🚫 suficientes                             |
-| `bot/ranking.py`       | Conta os 😂 da semana e anuncia o pódio com o termômetro                     |
+| `bot/ranking.py`       | Conta os 😂 da semana e monta o anúncio com o termômetro                     |
 | `bot/historico.py`     | Lê e grava `dados/historico.json`                                            |
 | `bot/discord_api.py`   | Conversa com a API do Discord                                                |
 | `bot/config.py`        | Lê o `config.yml` e os secrets                                               |
-| `.github/workflows/`   | Os agendamentos: postar, moderar, Meme da Semana e testes                    |
+| `.github/workflows/`   | `postar-meme.yml` (o bot, de hora em hora) e `testes.yml`                    |

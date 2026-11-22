@@ -1,27 +1,35 @@
 name: Postar meme
 
+# O bot acorda de hora em hora: modera, posta se for horário (agenda no config.yml)
+# e anuncia o Meme da Semana no dia certo. Ele mesmo confere o horário, então acordar
+# atrasado ou duas vezes não faz ele postar fora de hora nem repetir.
+#
+# Quem acorda o bot:
+# - o "relógio externo" (cron-job.org, veja o README), que é pontual;
+# - o agendamento abaixo, de reserva (o do GitHub anda atrasando horas);
+# - o botão "Run workflow", que por padrão posta um meme na hora.
+
 on:
   schedule:
-    # 11h17, 16h17 e 21h17 no horário de Brasília.
-    # O minuto "quebrado" foge do horário de pico do GitHub (início de cada hora).
-    - cron: "17 11,16,21 * * *"
+    - cron: "17 * * * *"
       timezone: "America/Sao_Paulo"
   workflow_dispatch:
     inputs:
-      simular:
-        description: "Só simular (testa as fontes e mostra o meme escolhido, sem postar)"
-        type: boolean
-        default: false
+      modo:
+        description: "agora = posta um meme já · agenda = só posta se for horário · ranking = Meme da Semana já · simular = só testa"
+        type: choice
+        options: [agora, agenda, ranking, simular]
+        default: agora
 
 permissions:
   contents: write # para salvar o histórico e o termômetro no repositório
 
 concurrency:
-  group: postar-meme
+  group: bot-de-memes
   cancel-in-progress: false
 
 jobs:
-  postar:
+  bot:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -35,20 +43,16 @@ jobs:
       - name: Instalar dependências
         run: pip install -r requirements.txt
 
-      - name: Simular
-        if: ${{ inputs.simular }}
-        run: python -m bot.postar --simular
-
-      - name: Postar meme
-        if: ${{ !inputs.simular }}
+      - name: Rodar o bot
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
-        run: python -m bot.postar
+          MODO: ${{ inputs.modo || 'agenda' }}
+        run: python -m bot.postar --modo "$MODO"
 
       - name: Salvar histórico e termômetro
-        # roda mesmo se o post falhar, para não perder os votos já contados
-        if: ${{ !cancelled() && !inputs.simular }}
+        # roda mesmo se algo falhar, para não perder o que já foi feito
+        if: ${{ !cancelled() && inputs.modo != 'simular' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -57,7 +61,7 @@ jobs:
             echo "Nada novo para salvar."
             exit 0
           fi
-          git commit -m "🤖 Meme postado"
+          git commit -m "🤖 Bot de memes"
           for tentativa in 1 2 3; do
             git pull --rebase && git push && exit 0
             sleep 5

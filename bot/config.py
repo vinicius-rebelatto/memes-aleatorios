@@ -3,14 +3,19 @@
 from __future__ import annotations
 
 import os
+import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from datetime import time, timedelta
 from pathlib import Path
 
 import yaml
 
+from .agenda import DIAS_DA_SEMANA
+
 RAIZ = Path(__file__).resolve().parent.parent
 CONFIG_PADRAO = RAIZ / "config.yml"
+HORARIOS_PADRAO = (time(9), time(12), time(15), time(18), time(21))
 
 
 class ErroDeConfiguracao(Exception):
@@ -62,6 +67,48 @@ class Config:
     estoque_chance: float = 0.2
     historico: Path = RAIZ / "dados" / "historico.json"
     termometro: Path = RAIZ / "dados" / "termometro.json"
+    horarios: tuple[time, ...] = HORARIOS_PADRAO
+    tolerancia: timedelta = timedelta(minutes=120)
+    ranking_dia: int = 6  # 0 = segunda ... 6 = domingo
+    ranking_horario: time = time(21)
+
+
+def _horario(valor, nome: str) -> time:
+    """Aceita "09:00", "9h", "21h30" e também o número que o YAML cria com 12:00 sem aspas."""
+    if isinstance(valor, int) and not isinstance(valor, bool):
+        horas, minutos = (valor, 0) if valor < 24 else divmod(valor, 60)
+    else:
+        texto = str(valor).strip().lower().replace("h", ":")
+        partes = texto.split(":") + ["0"]
+        try:
+            horas, minutos = int(partes[0]), int(partes[1] or 0)
+        except ValueError:
+            raise ErroDeConfiguracao(f"No config.yml, '{nome}' precisa ser um horário como \"09:00\".") from None
+    if not (0 <= horas < 24 and 0 <= minutos < 60):
+        raise ErroDeConfiguracao(f"No config.yml, '{nome}' não é um horário válido ({valor}).")
+    return time(horas, minutos)
+
+
+def _dia_da_semana(valor) -> int:
+    texto = unicodedata.normalize("NFKD", str(valor)).encode("ascii", "ignore").decode().lower()
+    texto = texto.replace("-feira", "").strip()
+    if texto not in DIAS_DA_SEMANA:
+        raise ErroDeConfiguracao(
+            f"No config.yml, ranking.dia precisa ser um dia da semana, como 'domingo' (veio '{valor}')."
+        )
+    return DIAS_DA_SEMANA[texto]
+
+
+def _ler_agenda(dados: dict) -> tuple[tuple[time, ...], timedelta]:
+    agenda = _secao(dados, "agenda")
+    lista = agenda.get("horarios", [h.strftime("%H:%M") for h in HORARIOS_PADRAO])
+    if not isinstance(lista, list) or not lista:
+        raise ErroDeConfiguracao('No config.yml, agenda.horarios precisa ser uma lista, como ["09:00", "12:00"].')
+    horarios = tuple(sorted({_horario(item, "agenda.horarios") for item in lista}))
+    minutos = _numero(agenda.get("tolerancia_minutos", 120), "agenda.tolerancia_minutos", int)
+    if minutos < 1:
+        raise ErroDeConfiguracao("agenda.tolerancia_minutos precisa ser pelo menos 1.")
+    return horarios, timedelta(minutes=minutos)
 
 
 def _secao(dados: dict, nome: str) -> dict:
@@ -148,8 +195,13 @@ def carregar_config(caminho: Path | str = CONFIG_PADRAO) -> Config:
     pasta = Path(str(estoque.get("pasta", "estoque")))
     if not pasta.is_absolute():
         pasta = caminho.parent / pasta
+    horarios, tolerancia = _ler_agenda(dados)
 
     return Config(
+        horarios=horarios,
+        tolerancia=tolerancia,
+        ranking_dia=_dia_da_semana(ranking.get("dia", "domingo")),
+        ranking_horario=_horario(ranking.get("horario", "21:00"), "ranking.horario"),
         fontes=_ler_fontes(dados),
         reacoes=_ler_reacoes(dados),
         votos_para_remover=votos_para_remover,
