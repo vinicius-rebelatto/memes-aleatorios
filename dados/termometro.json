@@ -1,9 +1,9 @@
 {
-  "regua": 4.0,
+  "regua": 4.75,
   "afinidade": {
     "HUEstation": -1.0,
-    "eu_nvr": 0.25,
-    "me_irl": 0.5
+    "eu_nvr": 0.5,
+    "me_irl": 0.25
   },
   "evolucao": [
     {
@@ -18,6 +18,10 @@
       "quando": "2026-11-22T13:02:33-03:00",
       "regua": 4.0,
       "motivo": "ajuste manual"
+    },
+    {
+      "quando": "2026-11-22T18:06:59-03:00",
+      "regua": 4.75
     }
   ],
   "votos_contados": {
@@ -28,22 +32,28 @@
       "passou_do_ponto": 0
     },
     "1573775709636268383": {
-      "engracado": 1,
+      "engracado": 2,
       "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1573847512865833104": {
-      "engracado": 0,
-      "sem_graca": 4,
+      "engracado": 1,
+      "sem_graca": 5,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1573952873484648449": {
       "engracado": 2,
-      "sem_graca": 0,
-      "mais_pesado": 2,
+      "sem_graca": 1,
+      "mais_pesado": 4,
       "passou_do_ponto": 1
+    },
+    "1574080470575218739": {
+      "engracado": 1,
+      "sem_graca": 1,
+      "mais_pesado": 3,
+      "passou_do_ponto": 0
     }
   }
 }
