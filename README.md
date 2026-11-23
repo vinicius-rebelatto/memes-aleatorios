@@ -6,7 +6,7 @@ Roda de graça no GitHub Actions: não tem servidor, nem nada ligado o tempo tod
 
 ## Como funciona
 
-**5 memes por dia, de 3 em 3 horas: 9h, 12h, 15h, 18h e 21h** (horário de Brasília). Cada meme chega com 4 reações:
+**18 memes por dia, de hora em hora, das 9h às 2h da manhã** (horário de Brasília). Cada meme chega com 4 reações:
 
 | Reação | Significa         | O que muda                                                     |
 | ------ | ----------------- | -------------------------------------------------------------- |
@@ -18,7 +18,7 @@ Roda de graça no GitHub Actions: não tem servidor, nem nada ligado o tempo tod
 - **Domingo às 21h** sai o 🏆 **Meme da Semana** com o pódio e o 🌡️ termômetro da galera. Memes que a galera
   posta no canal também concorrem.
 - O bot **acorda de hora em hora**: confere os 🚫, apaga o que passou do ponto e, se for um dos horários, posta.
-  Ele mesmo confere a hora, então **nunca posta de madrugada nem posta dois memes no mesmo horário**, mesmo que
+  Ele mesmo confere a hora, então **nunca posta entre 2h e 9h nem posta dois memes no mesmo horário**, mesmo que
   seja acordado atrasado ou mais de uma vez.
 - De vez em quando (20%) ele posta do [estoque da galera](#-estoque-da-galera).
 
@@ -164,6 +164,7 @@ O resultado de cada execução aparece na aba **Actions** (clique na execução 
 | Mensagem                                         | O que fazer                                                                                     |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
 | ⏰ Fora do horário de posts / ✅ O meme das 12h já saiu | Normal: o bot acordou, moderou e não era hora de postar.                                  |
+| ⚠️ Não achei nenhum meme novo... Tento de novo no próximo horário | Normal de vez em quando (são 18 posts por dia). Se virar rotina, adicione fontes ou memes no estoque. |
 | ⚠️ secrets ainda não foram configurados          | Faça o passo 4.                                                                                 |
 | ❌ O token foi recusado                          | Gere outro token (passo 1) e atualize o secret `DISCORD_TOKEN`.                                 |
 | ❌ O bot não consegue ver o canal / Falta permissão | Convide de novo com o link do passo 2. Se o canal ou a categoria for restrito, libere o cargo do bot nele. |

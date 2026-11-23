@@ -2,7 +2,7 @@ from datetime import date, datetime, time, timedelta, timezone
 
 import pytest
 
-from bot.agenda import formatar, janela_aberta, proximo_horario, ranking_na_hora
+from bot.agenda import descrever_horarios, formatar, janela_aberta, proximo_horario, ranking_na_hora
 
 BRT = timezone(timedelta(hours=-3))
 HORARIOS = (time(9), time(12), time(15), time(18), time(21))
@@ -59,3 +59,26 @@ def test_ranking_no_domingo_as_21h_uma_vez_so():
 def test_formatar():
     assert formatar(em(9)) == "9h"
     assert formatar(time(21, 30)) == "21h30"
+
+
+@pytest.mark.parametrize(
+    ("horarios", "esperado"),
+    [
+        ((0, 1, 2, *range(9, 24)), "de hora em hora, das 9h às 2h"),
+        ((9, 12, 15, 18, 21), "de 3 em 3 horas, das 9h às 21h"),
+        ((9, 13, 20), "9h, 13h, 20h"),
+        ((21, 9), "9h, 21h"),
+    ],
+)
+def test_descrever_horarios(horarios, esperado):
+    assert descrever_horarios(tuple(time(h) for h in horarios)) == esperado
+
+
+def test_hora_em_hora_ate_as_2h_atravessa_a_madrugada():
+    horarios = tuple(time(h) for h in (0, 1, 2, *range(9, 24)))
+    assert janela_aberta(horarios, DUAS_HORAS, em(0, 10, dia=23)) == em(0, dia=23)
+    assert janela_aberta(horarios, DUAS_HORAS, em(1, 59, dia=23)) == em(1, dia=23)  # o das 2h ainda não chegou
+    assert janela_aberta(horarios, DUAS_HORAS, em(3, 30, dia=23)) == em(2, dia=23)  # tolerância do último
+    assert janela_aberta(horarios, DUAS_HORAS, em(4, 1, dia=23)) is None  # madrugada: nada até as 9h
+    assert janela_aberta(horarios, DUAS_HORAS, em(13, 59)) == em(13)  # a janela fecha no próximo horário
+    assert proximo_horario(horarios, em(4, 1, dia=23)) == em(9, dia=23)

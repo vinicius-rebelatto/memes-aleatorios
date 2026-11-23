@@ -195,11 +195,19 @@ def test_nsfw_so_vale_em_canal_restrito_por_idade(config, tmp_path):
     assert not any("restrito por idade" in aviso for aviso in avisos)
 
 
-def test_sem_meme_novo_vira_erro_sem_derrubar_o_resto(config, tmp_path):
-    resultado, discord, _, _ = rodar(config, tmp_path, "agenda", em(21, 2), escolher=lambda: None)
-    assert resultado.meme is None and resultado.erros
+def test_sem_meme_novo_na_agenda_e_so_um_aviso_e_nao_derruba_o_resto(config, tmp_path):
+    avisos = []
+    resultado, discord, _, _ = rodar(config, tmp_path, "agenda", em(21, 2), escolher=lambda: None, log=avisos.append)
+    assert resultado.meme is None and not resultado.erros  # sem e-mail de falha
+    assert any("próximo horário" in aviso for aviso in avisos)
     assert resultado.ranking  # o Meme da Semana saiu mesmo assim
     assert len(discord.enviadas) == 1
+
+
+def test_sem_meme_novo_no_botao_e_erro(config, tmp_path):
+    resultado, discord, _, _ = rodar(config, tmp_path, "agora", em(12), escolher=lambda: None)
+    assert resultado.meme is None and resultado.erros
+    assert discord.enviadas == []
 
 
 def test_problema_ao_ler_ou_reagir_nao_impede_o_post(config, tmp_path):
@@ -248,6 +256,6 @@ def test_simular_testa_as_fontes_e_mostra_o_post_sem_usar_o_discord(monkeypatch,
     assert main(["--modo", "simular"]) == 0
     saida = capsys.readouterr().out
     assert "r/eu_nvr" in saida and "r/circojeca" in saida  # tabela de diagnóstico das fontes
-    assert "⏰ Horários: 9h, 12h, 15h, 18h, 21h" in saida
+    assert "⏰ Horários: de hora em hora, das 9h às 2h" in saida
     corpo = json.loads(saida[saida.index("{", saida.index("🧪")) :])
     assert corpo["embeds"][0]["image"]["url"] == "https://i.redd.it/abc1.png"

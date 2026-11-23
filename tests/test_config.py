@@ -16,7 +16,7 @@ def test_config_do_repositorio_carrega():
         "ShitpostBR": 4,
         "circojeca": 5,
     }
-    assert config.horarios == (time(9), time(12), time(15), time(18), time(21))
+    assert config.horarios == tuple(time(h) for h in (0, 1, 2, *range(9, 24)))  # de hora em hora, 9h às 2h
     assert config.tolerancia == timedelta(hours=2)
     assert (config.ranking_dia, config.ranking_horario) == (6, time(21))
     assert config.reacoes.em_ordem() == ("😂", "😐", "🌶️", "🚫")

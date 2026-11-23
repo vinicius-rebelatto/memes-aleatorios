@@ -24,7 +24,7 @@ from datetime import datetime, timedelta
 
 import requests
 
-from .agenda import formatar, janela_aberta, proximo_horario, ranking_na_hora
+from .agenda import descrever_horarios, formatar, janela_aberta, proximo_horario, ranking_na_hora
 from .config import Config, ErroDeConfiguracao, SegredosAusentes, carregar_config, ler_segredos
 from .discord_api import Discord, ErroDiscord
 from .fontes import ErroDeFonte, Meme, buscar_memes, escolher_meme, titulo_util
@@ -183,7 +183,13 @@ def executar(
                 discord, config, historico, termometro, canal_id, permitir_nsfw, quando, escolher, log
             )
             log(f"✅ Meme postado! {descrever_origem(resultado.meme)}")
-        except (SemMemeNovo, ErroDiscord) as erro:
+        except SemMemeNovo as erro:
+            if modo == "agenda":  # com muitos horários, faltar meme às vezes é normal: tenta no próximo
+                log(f"⚠️ {erro} Tento de novo no próximo horário.")
+            else:
+                resultado.erros.append(str(erro))
+                log(f"❌ {erro}")
+        except ErroDiscord as erro:
             resultado.erros.append(str(erro))
             log(f"❌ {erro}")
 
@@ -214,7 +220,7 @@ def diagnosticar_fontes(config: Config, termometro: Termometro, historico: Histo
     pesos = {fonte.subreddit: termometro.peso_da_fonte(fonte) for fonte in config.fontes}
     total = sum(pesos.values()) or 1
     print(f"🌡️ Régua: {termometro.descrever_regua()}")
-    print(f"⏰ Horários: {', '.join(formatar(h) for h in config.horarios)}\n")
+    print(f"⏰ Horários: {descrever_horarios(config.horarios)}\n")
     print("Fonte                 nível  chance   memes  novos  nsfw")
     for fonte in config.fontes:
         chance = numero_br(100 * pesos[fonte.subreddit] / total) + "%"
