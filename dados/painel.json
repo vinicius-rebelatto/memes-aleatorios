@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-11-22T23:18:12-03:00",
+  "atualizado_em": "2026-11-23T11:28:19-03:00",
   "regua": 5.0,
   "regua_texto": "5,0/5 🟩🟩🟨🟧🟥",
   "regua_na_semana": "🌶️ subiu 2,0",
@@ -16,61 +16,61 @@
     {
       "subreddit": "HolUp",
       "nivel": 5.0,
-      "chance": 0.2602,
+      "chance": 0.2536,
       "afinidade": 0.75
     },
     {
       "subreddit": "circojeca",
       "nivel": 5.0,
-      "chance": 0.2297,
+      "chance": 0.2238,
       "afinidade": 0.5
     },
     {
       "subreddit": "eu_nvr",
       "nivel": 4.0,
-      "chance": 0.1207,
+      "chance": 0.1178,
+      "afinidade": 0.5
+    },
+    {
+      "subreddit": "MinecraftMemes",
+      "nivel": null,
+      "chance": 0.1119,
       "afinidade": 0.5
     },
     {
       "subreddit": "dankmemes",
       "nivel": 4.0,
-      "chance": 0.094,
+      "chance": 0.0917,
       "afinidade": 0.0
     },
     {
       "subreddit": "leagueofmemes",
       "nivel": null,
-      "chance": 0.0894,
-      "afinidade": 0.0
-    },
-    {
-      "subreddit": "MinecraftMemes",
-      "nivel": null,
-      "chance": 0.0894,
+      "chance": 0.0871,
       "afinidade": 0.0
     },
     {
       "subreddit": "dontstarve",
       "nivel": null,
-      "chance": 0.0537,
+      "chance": 0.0523,
       "afinidade": 0.0
     },
     {
       "subreddit": "DiretoDoZapZap",
       "nivel": 2.0,
-      "chance": 0.0225,
+      "chance": 0.0222,
       "afinidade": 0.0
     },
     {
       "subreddit": "MemesBR",
       "nivel": 2.0,
-      "chance": 0.0225,
+      "chance": 0.0222,
       "afinidade": 0.0
     },
     {
       "subreddit": "HUEstation",
       "nivel": 3.0,
-      "chance": 0.0178,
+      "chance": 0.0174,
       "afinidade": -1.0
     }
   ],

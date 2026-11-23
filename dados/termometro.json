@@ -3,6 +3,7 @@
   "afinidade": {
     "HUEstation": -1.0,
     "HolUp": 0.75,
+    "MinecraftMemes": 0.5,
     "ShitpostBR": -1.0,
     "circojeca": 0.5,
     "eu_nvr": 0.5,
@@ -102,6 +103,12 @@
       "engracado": 1,
       "sem_graca": 0,
       "mais_pesado": 1,
+      "passou_do_ponto": 0
+    },
+    "1574247678492147773": {
+      "engracado": 2,
+      "sem_graca": 0,
+      "mais_pesado": 0,
       "passou_do_ponto": 0
     }
   }

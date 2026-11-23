@@ -165,6 +165,13 @@
       "imagem": "https://i.redd.it/boame0oq1s2i1.png",
       "votos_reddit": 2756,
       "postado_em": "2026-11-22T23:18:12-03:00"
+    },
+    {
+      "id_mensagem": "1574431411434295447",
+      "fonte": "estoque",
+      "chave": "estoque/hqdefault.jpg",
+      "arquivo": "hqdefault.jpg",
+      "postado_em": "2026-11-23T11:28:19-03:00"
     }
   ],
   "rankings": [
