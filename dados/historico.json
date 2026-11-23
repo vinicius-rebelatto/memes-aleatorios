@@ -70,6 +70,18 @@
       "votos_reddit": 288,
       "nivel": 5.0,
       "postado_em": "2026-11-22T18:06:59-03:00"
+    },
+    {
+      "id_mensagem": "1574213613160374273",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1w5jnw6",
+      "subreddit": "circojeca",
+      "titulo": "Rinha de galo",
+      "link": "https://redd.it/1w5jnw6",
+      "imagem": "https://i.redd.it/f4rh6wt1n5nh1.png",
+      "votos_reddit": 9,
+      "nivel": 5.0,
+      "postado_em": "2026-11-22T21:02:51-03:00"
     }
   ],
   "rankings": []

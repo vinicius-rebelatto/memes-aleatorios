@@ -1,7 +1,8 @@
 {
-  "regua": 4.75,
+  "regua": 5.0,
   "afinidade": {
     "HUEstation": -1.0,
+    "circojeca": -0.5,
     "eu_nvr": 0.5,
     "me_irl": 0.25
   },
@@ -22,6 +23,10 @@
     {
       "quando": "2026-11-22T18:06:59-03:00",
       "regua": 4.75
+    },
+    {
+      "quando": "2026-11-22T21:02:51-03:00",
+      "regua": 5.0
     }
   ],
   "votos_contados": {
@@ -34,13 +39,13 @@
     "1573775709636268383": {
       "engracado": 2,
       "sem_graca": 1,
-      "mais_pesado": 0,
+      "mais_pesado": 1,
       "passou_do_ponto": 0
     },
     "1573847512865833104": {
       "engracado": 1,
       "sem_graca": 5,
-      "mais_pesado": 0,
+      "mais_pesado": 1,
       "passou_do_ponto": 0
     },
     "1573952873484648449": {
@@ -52,7 +57,13 @@
     "1574080470575218739": {
       "engracado": 1,
       "sem_graca": 1,
-      "mais_pesado": 3,
+      "mais_pesado": 5,
+      "passou_do_ponto": 0
+    },
+    "1574169353841147939": {
+      "engracado": 0,
+      "sem_graca": 2,
+      "mais_pesado": 5,
       "passou_do_ponto": 0
     }
   }
