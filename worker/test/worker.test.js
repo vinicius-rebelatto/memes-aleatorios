@@ -186,7 +186,7 @@ describe("/meme", () => {
     ); // apaga o "pensando" e avisa só quem pediu
     const aviso = JSON.parse(discord[1].opcoes.body);
     assert.equal(aviso.flags, 64);
-    assert.match(aviso.content, /Não achei meme em r\/qualquercoisa/);
+    assert.match(aviso.content, /Não achei meme novo em r\/qualquercoisa .*nada NSFW/);
   });
 
   it("fonte do config.yml pode trazer NSFW, mas só em canal +18", async () => {
@@ -241,6 +241,13 @@ describe("escolha do meme", () => {
     assert.deepEqual([...sorteados].sort(), ["https://redd.it/1x00000"]);
     assert.equal(escolherMeme(memes, { recentes, permitirNsfw: true, aleatorio: () => 0 }).postLink, "https://redd.it/1y00013");
     assert.equal(escolherMeme([memeDaApi("1y1", { spoiler: true })]), null);
+  });
+
+  it("subreddit escolhido aceita posts de até 1 ano", async () => {
+    // o mais novo da busca é 1y00002; 1t00000 tem uns 200 dias a menos
+    const memes = { circojeca: [memeDaApi("1y00002", { url: "https://v.redd.it/video" }), memeDaApi("1t00000")] };
+    const { discord } = await rodar(comando("meme", [{ name: "subreddit", value: "circojeca" }]), internetFalsa({ memes }));
+    assert.equal(discord[0].metodo, "PATCH");
   });
 
   it("ajudantes", () => {

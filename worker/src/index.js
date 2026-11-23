@@ -20,6 +20,7 @@ const LIMITE_DE_UPLOAD = 10 * 1024 * 1024; // se o Discord não disser o limite 
 const IDS_POR_DIA = 1_450_000; // posts novos no Reddit inteiro por dia (para estimar a idade)
 const MEIA_VIDA_DIAS = 3;
 const IDADE_MAXIMA_DIAS = 60;
+const IDADE_MAXIMA_ESCOLHIDO_DIAS = 365; // subreddit escolhido de propósito: aceita posts mais antigos
 const FONTES_POR_TENTATIVA = 3;
 const EFEMERA = 64; // mensagem que só quem usou o comando vê
 const SEM_MENCOES = { parse: [] };
@@ -294,7 +295,10 @@ export async function buscarMemes(subreddit) {
  * Sorteia um meme: só imagens, sem spoiler, sem os que o bot mandou nos últimos dias e com
  * menos de 60 dias. Os mais votados e mais novos têm mais chance.
  */
-export function escolherMeme(memes, { recentes = new Set(), permitirNsfw = false, aleatorio = Math.random } = {}) {
+export function escolherMeme(
+  memes,
+  { recentes = new Set(), permitirNsfw = false, idadeMaxima = IDADE_MAXIMA_DIAS, aleatorio = Math.random } = {},
+) {
   const ids = memes.map((meme) => idDoPost(meme.postLink)).filter((id) => id !== null);
   const maisNovo = ids.length ? Math.max(...ids) : null;
   const candidatos = [];
@@ -303,7 +307,7 @@ export function escolherMeme(memes, { recentes = new Set(), permitirNsfw = false
     if (meme.nsfw && !permitirNsfw) continue;
     const id = idDoPost(meme.postLink);
     const idade = id !== null && maisNovo !== null ? (maisNovo - id) / IDS_POR_DIA : null;
-    if (idade !== null && idade > IDADE_MAXIMA_DIAS) continue;
+    if (idade !== null && idade > idadeMaxima) continue;
     const peso = Math.sqrt((Number(meme.ups) || 0) + 1) * (idade === null ? 1 : 0.5 ** (idade / MEIA_VIDA_DIAS));
     candidatos.push({ meme, peso });
   }
@@ -346,7 +350,9 @@ async function mandarMeme(interacao, env) {
     }
     // NSFW só sai das fontes do config.yml e só em canal restrito por idade.
     // Outro subreddit escolhido na hora nunca traz NSFW: o /meme é para memes.
-    const meme = escolherMeme(memes, { recentes, permitirNsfw: canalMais18 && !fonte.livre });
+    const permitirNsfw = canalMais18 && !fonte.livre;
+    const idadeMaxima = pedido ? IDADE_MAXIMA_ESCOLHIDO_DIAS : IDADE_MAXIMA_DIAS;
+    const meme = escolherMeme(memes, { recentes, permitirNsfw, idadeMaxima });
     if (meme) return enviarImagem(interacao, meme);
     problemas.push({ fonte, erro: null });
   }
@@ -357,7 +363,8 @@ async function mandarMeme(interacao, env) {
   if (erro && [403, 404].includes(erro.status)) {
     return avisarProblema(interacao, `🤔 O r/${fontes[0].subreddit} não existe ou está fechado.`);
   }
-  return avisarProblema(interacao, `😕 Não achei meme em r/${fontes[0].subreddit} agora (só vale imagem e nada NSFW).`);
+  const regra = canalMais18 && !fontes[0].livre ? "só vale imagem" : "só vale imagem e nada NSFW";
+  return avisarProblema(interacao, `😕 Não achei meme novo em r/${fontes[0].subreddit} agora (${regra}). Tenta outro subreddit.`);
 }
 
 async function baixarImagem(url, limite) {
