@@ -74,15 +74,15 @@
       "passou_do_ponto": 0
     },
     "1574218690851774629": {
-      "engracado": 0,
+      "engracado": 1,
       "sem_graca": 3,
       "mais_pesado": 3,
       "passou_do_ponto": 0
     },
     "1574218997392605286": {
       "engracado": 0,
-      "sem_graca": 1,
-      "mais_pesado": 4,
+      "sem_graca": 2,
+      "mais_pesado": 5,
       "passou_do_ponto": 0
     }
   }

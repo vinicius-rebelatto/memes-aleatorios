@@ -118,6 +118,18 @@
       "votos_reddit": 3,
       "nivel": 4.0,
       "postado_em": "2026-11-22T21:37:23-03:00"
+    },
+    {
+      "id_mensagem": "1574233764425367702",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1y2lgsy",
+      "subreddit": "HolUp",
+      "titulo": "Thank you for your service",
+      "link": "https://redd.it/1y2lgsy",
+      "imagem": "https://i.redd.it/07l75ps2w43i1.png",
+      "votos_reddit": 5671,
+      "nivel": 5.0,
+      "postado_em": "2026-11-22T22:22:55-03:00"
     }
   ],
   "rankings": [

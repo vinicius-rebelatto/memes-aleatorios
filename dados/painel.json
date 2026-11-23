@@ -1,9 +1,11 @@
 {
-  "atualizado_em": "2026-11-22T22:06:44-03:00",
+  "atualizado_em": "2026-11-22T22:22:55-03:00",
   "regua": 5.0,
   "regua_texto": "5,0/5 🟩🟩🟨🟧🟥",
   "regua_na_semana": "🌶️ subiu 2,0",
   "horarios": "de hora em hora, das 9h às 2h",
+  "ranking": "domingo às 21h",
+  "votos_para_remover": 3,
   "reacoes": {
     "engracado": "😂",
     "sem_graca": "😐",
@@ -89,6 +91,7 @@
     "https://redd.it/1w5jnw6",
     "https://redd.it/1y2dyqh",
     "https://redd.it/1y318t4",
-    "https://redd.it/1y2t3yl"
+    "https://redd.it/1y2t3yl",
+    "https://redd.it/1y2lgsy"
   ]
 }
