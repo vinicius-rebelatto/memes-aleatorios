@@ -19,15 +19,26 @@ sem moldura, título ou texto, com 4 reações:
 
 - **Domingo às 21h** sai o 🏆 **Meme da Semana** com o pódio e o 🌡️ termômetro da galera. Memes que a galera
   posta no canal também concorrem.
-- O bot **acorda de hora em hora**: confere os 🚫, apaga o que passou do ponto e, se for um dos horários, posta.
+- O bot **acorda de hora em hora** (com o relógio do [passo 6](#6-relógio-pontual-e-comandos-na-cloudflare-grátis-uns-10-minutos)):
+  confere os 🚫, apaga o que passou do ponto e, se for um dos horários, posta.
   Ele mesmo confere a hora, então **nunca posta entre 2h e 9h nem posta dois memes no mesmo horário**, mesmo que
   seja acordado atrasado ou mais de uma vez.
 - De vez em quando (20%) ele posta do [estoque da galera](#-estoque-da-galera).
-- Comandos: `/meme` manda um meme na hora, `/termometro` mostra a régua e `/ajuda` explica as reações
-  (veja o [passo 7](#7-comandos-meme-termometro-e-ajuda)).
 
 > 💡 Sugestão de tópico para o canal (Editar canal → Tópico): *Meme de hora em hora 🤖 Reaja: 😂 engraçado ·
 > 😐 sem graça · 🌶️ mais pesado · 🚫 passou do ponto (3 🚫 apagam). /meme pede um na hora, /termometro mostra a régua.*
+
+### 💬 Comandos
+
+| Comando                          | O que faz                                                                          |
+| -------------------------------- | ---------------------------------------------------------------------------------- |
+| `/meme`                          | Manda um meme na hora, sorteado pelo algoritmo da galera (só a imagem)             |
+| `/meme subreddit:MinecraftMemes` | Manda um meme de um subreddit escolhido (as fontes do `config.yml` aparecem como sugestão) |
+| `/termometro`                    | Mostra a régua, a chance de cada fonte e quem está em alta e em baixa             |
+| `/ajuda`                         | Explica as reações e os comandos (só quem pediu vê)                                |
+
+Os memes do `/meme` são extras: não mexem no termômetro e não concorrem ao Meme da Semana. Os comandos são
+ligados no [passo 6](#6-relógio-pontual-e-comandos-na-cloudflare-grátis-uns-10-minutos) da instalação.
 
 ### 🌡️ O algoritmo da galera
 
@@ -109,51 +120,17 @@ Em um minuto o meme aparece no canal. ✅
 Os outros modos do botão: **agenda** (só posta se for horário), **ranking** (anuncia o Meme da Semana na hora)
 e **simular** (testa todas as fontes e mostra no log qual meme seria postado, sem postar nada).
 
-### 6. Relógio externo para os horários certinhos (recomendado)
+### 6. Relógio pontual e comandos, na Cloudflare (grátis, uns 10 minutos)
 
-O agendador do próprio GitHub anda atrasando execuções em **horas** e às vezes nem roda. O bot já se protege
-disso (nunca posta fora de hora), mas para os memes saírem **na hora certa** vale colocar um relógio externo
-gratuito, o [cron-job.org](https://cron-job.org), para acordar o bot de hora em hora. Leva uns 5 minutos.
+Duas coisas rodam num **Worker da Cloudflare**, de graça:
 
-**a) Criar um token só para acordar o bot.** No GitHub: sua foto → **Settings → Developer settings →
-Personal access tokens → Fine-grained tokens → Generate new token**.
+- **O relógio.** O agendador do próprio GitHub anda atrasando execuções em **horas** e às vezes nem roda.
+  O bot se protege disso (nunca posta fora de hora), mas **sem um relógio externo ele perde a maioria dos
+  horários**. O Worker acorda o bot no minuto 0 de cada hora.
+- **Os comandos** `/meme`, `/termometro` e `/ajuda` (veja [Comandos](#-comandos)).
 
-- **Token name:** `relogio-memes`
-- **Expiration:** 1 ano (anote para renovar)
-- **Repository access:** *Only select repositories* → `memes-aleatorios`
-- **Permissions → Repository permissions → Actions:** *Read and write* (só essa)
-
-Gere e copie o token. Ele só consegue disparar os workflows deste repositório e mais nada.
-
-**b) Criar o relógio no cron-job.org.** Crie uma conta grátis e clique em **Create cronjob**:
-
-- **URL:** `https://api.github.com/repos/vinicius-rebelatto/memes-aleatorios/actions/workflows/postar-meme.yml/dispatches`
-- **Execution schedule:** a cada hora, no minuto 0 (fuso `America/Sao_Paulo`)
-- Na aba **Advanced**:
-  - **Request method:** `POST`
-  - **Headers:**
-    - `Accept`: `application/vnd.github+json`
-    - `Authorization`: `Bearer COLE_O_TOKEN_AQUI`
-    - `Content-Type`: `application/json`
-  - **Request body:** `{"ref":"main","inputs":{"modo":"agenda"}}`
-
-Salve e use **Test run**: a resposta deve ser `204` e uma execução nova aparece na aba **Actions**. Pronto:
-o bot passa a acordar pontualmente. O agendamento do GitHub continua lá como reserva.
-
-### 7. Comandos `/meme`, `/termometro` e `/ajuda`
-
-| Comando                         | O que faz                                                                           |
-| ------------------------------- | ----------------------------------------------------------------------------------- |
-| `/meme`                         | Manda um meme na hora, sorteado pelo algoritmo da galera (só a imagem)              |
-| `/meme subreddit:MinecraftMemes` | Manda um meme de um subreddit escolhido (as fontes do `config.yml` aparecem como sugestão) |
-| `/termometro`                   | Mostra a régua, a chance de cada fonte e quem está em alta e em baixa              |
-| `/ajuda`                        | Explica as reações e os comandos (só quem pediu vê)                                 |
-
-Os memes do `/meme` são extras: não mexem no termômetro e não concorrem ao Meme da Semana.
-
-Os comandos rodam num **Worker da Cloudflare**, de graça (o plano grátis aguenta 100 mil comandos por dia).
-Quem publica o Worker, liga ele ao Discord e registra os comandos é o GitHub Actions; você só cria a conta e
-cola dois secrets. Leva uns 10 minutos.
+Quem publica o Worker, liga ele ao Discord e registra os comandos é o GitHub Actions. Você só cria as contas e
+cola três secrets.
 
 **a) Conta.** Crie uma conta grátis em <https://dash.cloudflare.com/sign-up> e confirme o e-mail.
 
@@ -163,23 +140,52 @@ Isso cria o seu endereço `*.workers.dev`. Não precisa criar nenhum Worker lá.
 **c) Account ID.** Ainda em **Workers & Pages**, copie o **Account ID** que aparece na lateral (ou, na página
 inicial da conta, menu **⋯** ao lado do nome da conta → **Copy account ID**).
 
-**d) Token.** Clique na sua foto (canto superior direito) → **Profile → API Tokens → Create Token**, e no modelo
-**Edit Cloudflare Workers** clique em **Use template**. Em *Account Resources* escolha a sua conta e deixe
-*Zone Resources* como está. **Continue to summary → Create Token** e copie o token (ele só aparece uma vez).
+**d) Token da Cloudflare.** Clique na sua foto (canto superior direito) → **Profile → API Tokens → Create
+Token**, e no modelo **Edit Cloudflare Workers** clique em **Use template**. Em *Account Resources* escolha a
+sua conta e deixe *Zone Resources* como está. **Continue to summary → Create Token** e copie o token (ele só
+aparece uma vez).
 
-**e) Secrets.** No GitHub, no mesmo lugar do passo 4, crie mais dois:
+**e) Token do relógio (no GitHub).** É o que deixa o Worker acordar o bot. No GitHub: sua foto → **Settings →
+Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
 
-| Name                    | Secret                     |
-| ----------------------- | -------------------------- |
-| `CLOUDFLARE_API_TOKEN`  | o token do item d          |
-| `CLOUDFLARE_ACCOUNT_ID` | o Account ID do item c     |
+- **Token name:** `relogio-memes`
+- **Expiration:** 1 ano (anote para renovar)
+- **Repository access:** *Only select repositories* → `memes-aleatorios`
+- **Permissions → Repository permissions → Actions:** *Read and write* (só essa)
 
-**f) Ligar.** Aba **Actions → Comandos do Discord → Run workflow**. Em um ou dois minutos o log termina com
+Gere e copie o token. Ele só consegue disparar os workflows deste repositório e mais nada.
+
+**f) Secrets.** No GitHub, no mesmo lugar do passo 4, crie mais três:
+
+| Name                    | Secret                           |
+| ----------------------- | -------------------------------- |
+| `CLOUDFLARE_API_TOKEN`  | o token da Cloudflare (item d)   |
+| `CLOUDFLARE_ACCOUNT_ID` | o Account ID (item c)            |
+| `RELOGIO_GITHUB_TOKEN`  | o token do relógio (item e)      |
+
+**g) Ligar.** Aba **Actions → Comandos do Discord → Run workflow**. Em um ou dois minutos o log termina com
 `✅ Comandos registrados: /meme, /termometro, /ajuda`. Digite `/` no Discord para ver os comandos (se não
-aparecerem, aperte `Ctrl+R` para recarregar o Discord).
+aparecerem, aperte `Ctrl+R` para recarregar o Discord). A partir da próxima hora cheia, a aba **Actions**
+passa a mostrar uma execução do **Postar meme** por hora.
 
 > O workflow também preenche sozinho o campo **Interactions Endpoint URL** do app no portal do Discord. Não
-> precisa mexer lá. Sempre que a pasta `worker/` mudar, ele publica de novo sozinho.
+> precisa mexer lá. Sempre que a pasta `worker/` mudar, ele publica de novo sozinho. Quando o token do
+> relógio vencer, gere outro, atualize o secret e rode o **Comandos do Discord** de novo.
+
+<details>
+<summary>Alternativa para o relógio, sem Cloudflare: cron-job.org</summary>
+
+Crie o token do item e, uma conta grátis no [cron-job.org](https://cron-job.org) e clique em **Create cronjob**:
+
+- **URL:** `https://api.github.com/repos/vinicius-rebelatto/memes-aleatorios/actions/workflows/postar-meme.yml/dispatches`
+- **Execution schedule:** a cada hora, no minuto 0 (fuso `America/Sao_Paulo`)
+- Na aba **Advanced**: **Request method** `POST`; **Headers** `Accept: application/vnd.github+json`,
+  `Authorization: Bearer COLE_O_TOKEN_AQUI` e `Content-Type: application/json`; **Request body**
+  `{"ref":"main","inputs":{"modo":"agenda"}}`
+
+**Test run** deve responder `204`. Nesse caso não precisa do secret `RELOGIO_GITHUB_TOKEN`.
+
+</details>
 
 ## Personalizar
 
@@ -228,11 +234,12 @@ O resultado de cada execução aparece na aba **Actions** (clique na execução 
 | ❌ Não achei nenhum meme novo                    | A meme-api pode estar fora do ar. Se continuar, adicione outra fonte ou memes no estoque.       |
 | ℹ️ NSFW fica de fora                             | Normal: o canal não está marcado como restrito por idade (veja [NSFW](#-nsfw)).                 |
 | cron-job.org mostra erro `401`, `403` ou `404`   | Token errado, sem a permissão *Actions: Read and write*, vencido, ou URL digitada errada.        |
-| ⚠️ Os comandos ainda não foram ligados          | Faça o [passo 7](#7-comandos-meme-termometro-e-ajuda).                                          |
+| ⚠️ Os comandos ainda não foram ligados          | Faça o [passo 6](#6-relógio-pontual-e-comandos-na-cloudflare-grátis-uns-10-minutos).            |
+| Memes saem fora de hora ou pulam horários        | Falta o relógio: faça o passo 6 (com o secret `RELOGIO_GITHUB_TOKEN`).                          |
 | Comandos não aparecem no Discord                 | Aperte `Ctrl+R` no Discord e confira se o **Comandos do Discord** terminou com ✅. Se ainda não aparecerem, convide o bot de novo com o link do passo 2. |
 | "O aplicativo não respondeu" ao usar um comando  | Rode **Actions → Comandos do Discord → Run workflow** de novo: ele religa o Worker ao Discord.   |
-| Comandos do Discord falha com `workers.dev`      | Faltou o item b do passo 7 (abrir **Workers & Pages** uma vez).                                 |
-| Comandos do Discord falha com `Authentication error` | O token da Cloudflare está errado ou sem permissão: refaça o item d do passo 7.           |
+| Comandos do Discord falha com `workers.dev`      | Faltou o item b do passo 6 (abrir **Workers & Pages** uma vez).                                 |
+| Comandos do Discord falha com `Authentication error` | O token da Cloudflare está errado ou sem permissão: refaça o item d do passo 6.           |
 
 Também é normal:
 
@@ -262,5 +269,5 @@ cd worker && node --test              # testes dos comandos (precisa do Node 22 
 | `bot/historico.py`     | Lê e grava `dados/historico.json`                                            |
 | `bot/discord_api.py`   | Conversa com a API do Discord                                                |
 | `bot/config.py`        | Lê o `config.yml` e os secrets                                               |
-| `worker/`              | Os comandos do Discord (Worker da Cloudflare): `src/index.js` atende os comandos, `comandos.json` os define e `registrar.mjs` liga tudo ao Discord |
-| `.github/workflows/`   | `postar-meme.yml` (o bot, de hora em hora), `comandos.yml` (publica os comandos) e `testes.yml` |
+| `worker/`              | O Worker da Cloudflare: `src/index.js` atende os comandos e acorda o bot de hora em hora, `comandos.json` define os comandos e `registrar.mjs` liga tudo ao Discord |
+| `.github/workflows/`   | `postar-meme.yml` (o bot), `comandos.yml` (publica o Worker) e `testes.yml`  |

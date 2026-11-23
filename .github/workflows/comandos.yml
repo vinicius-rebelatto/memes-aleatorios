@@ -1,8 +1,8 @@
 name: Comandos do Discord
 
-# Publica o Worker da Cloudflare (pasta worker/) que atende /meme, /termometro e /ajuda,
-# liga ele ao Discord e registra os comandos. Roda sozinho quando a pasta worker/ muda;
-# para rodar na mão: Actions → Comandos do Discord → Run workflow.
+# Publica o Worker da Cloudflare (pasta worker/) que atende /meme, /termometro e /ajuda e
+# acorda o bot de hora em hora, liga ele ao Discord e registra os comandos. Roda sozinho
+# quando a pasta worker/ muda; para rodar na mão: Actions → Comandos do Discord → Run workflow.
 
 on:
   push:
@@ -30,12 +30,19 @@ jobs:
         env:
           TEM_CLOUDFLARE: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
           TEM_DISCORD: ${{ secrets.DISCORD_TOKEN != '' }}
+          TEM_RELOGIO: ${{ secrets.RELOGIO_GITHUB_TOKEN != '' }}
         run: |
+          echo "relogio=$TEM_RELOGIO" >> "$GITHUB_OUTPUT"
           if [ "$TEM_CLOUDFLARE" = "true" ] && [ "$TEM_DISCORD" = "true" ]; then
             echo "prontos=true" >> "$GITHUB_OUTPUT"
+            if [ "$TEM_RELOGIO" != "true" ]; then
+              aviso="Relógio desligado: sem o secret RELOGIO_GITHUB_TOKEN, os memes dependem do agendador do GitHub, que atrasa horas (passo 6 do README)."
+              echo "::warning::$aviso"
+              echo "⚠️ $aviso" >> "$GITHUB_STEP_SUMMARY"
+            fi
           else
             echo "prontos=false" >> "$GITHUB_OUTPUT"
-            aviso="Os comandos ainda não foram ligados: falta configurar os secrets CLOUDFLARE_API_TOKEN e CLOUDFLARE_ACCOUNT_ID (passo 7 do README). Nada foi feito."
+            aviso="Os comandos ainda não foram ligados: falta configurar os secrets CLOUDFLARE_API_TOKEN e CLOUDFLARE_ACCOUNT_ID (passo 6 do README). Nada foi feito."
             echo "::notice::$aviso"
             echo "⚠️ $aviso" >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -61,6 +68,15 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: worker
+
+      - name: Guardar o token do relógio no Worker
+        if: steps.secrets.outputs.prontos == 'true' && steps.secrets.outputs.relogio == 'true'
+        working-directory: worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          RELOGIO_GITHUB_TOKEN: ${{ secrets.RELOGIO_GITHUB_TOKEN }}
+        run: printf '%s' "$RELOGIO_GITHUB_TOKEN" | npx --yes wrangler@4 secret put RELOGIO_GITHUB_TOKEN
 
       - name: Ligar o Worker ao Discord e registrar os comandos
         if: steps.secrets.outputs.prontos == 'true'

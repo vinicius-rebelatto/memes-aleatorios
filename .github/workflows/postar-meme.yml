@@ -5,7 +5,7 @@ name: Postar meme
 # atrasado ou duas vezes não faz ele postar fora de hora nem repetir.
 #
 # Quem acorda o bot:
-# - o "relógio externo" (cron-job.org, veja o README), que é pontual;
+# - o relógio do Worker da Cloudflare (passo 6 do README), que é pontual;
 # - o agendamento abaixo, de reserva (o do GitHub anda atrasando horas);
 # - o botão "Run workflow", que por padrão posta um meme na hora.
 

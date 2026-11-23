@@ -1,9 +1,10 @@
 /**
- * Comandos do bot de memes no Discord: /meme, /termometro e /ajuda.
+ * Comandos do bot de memes no Discord (/meme, /termometro e /ajuda) e o relógio do bot.
  *
  * Roda de graça na Cloudflare Workers. O Discord manda cada comando para o endereço do
  * Worker; ele confere a assinatura, responde na hora ("pensando...") e depois edita a
- * resposta com o meme ou o termômetro.
+ * resposta com o meme ou o termômetro. De hora em hora, o Worker também acorda o bot no
+ * GitHub Actions (o agendador do próprio GitHub atrasa horas ou nem roda).
  *
  * As fontes, a régua e os memes que já saíram vêm do painel que o bot salva no GitHub
  * (dados/painel.json). Por isso não há nada para configurar aqui: mudou o config.yml,
@@ -101,7 +102,43 @@ export default {
     }
     return responder(interacao, env, ctx);
   },
+
+  async scheduled(_evento, env, ctx) {
+    ctx.waitUntil(acordarOBot(env));
+  },
 };
+
+// ---- relógio: acorda o bot de hora em hora ---------------------------------------------
+
+/** Dispara o workflow "Postar meme" no modo agenda (o bot confere se é hora de postar). */
+export async function acordarOBot(env) {
+  const token = String(env.RELOGIO_GITHUB_TOKEN || "").trim();
+  if (!token) {
+    console.log("⏰ Relógio desligado: falta o secret RELOGIO_GITHUB_TOKEN (passo 6 do README).");
+    return false;
+  }
+  const url = `https://api.github.com/repos/${env.REPOSITORIO}/actions/workflows/postar-meme.yml/dispatches`;
+  try {
+    const resposta = await fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "User-Agent": USER_AGENT_MEMES,
+      },
+      body: JSON.stringify({ ref: "main", inputs: { modo: "agenda" } }),
+    });
+    if (resposta.ok) {
+      console.log("⏰ Bot acordado.");
+      return true;
+    }
+    console.error(`⏰ O GitHub recusou (${resposta.status}): ${(await resposta.text()).slice(0, 300)}`);
+  } catch (erro) {
+    console.error("⏰ Não consegui falar com o GitHub:", erro.message);
+  }
+  return false;
+}
 
 const COMANDOS = {
   meme: { trabalho: mandarMeme, efemera: false },

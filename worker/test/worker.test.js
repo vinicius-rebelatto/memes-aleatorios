@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, it } from "node:test";
 import worker, {
   RESPOSTA,
   TIPO,
+  acordarOBot,
   escolherMeme,
   idDoPost,
   limparSubreddit,
@@ -310,6 +311,35 @@ describe("/termometro e /ajuda", () => {
     const { resposta } = await rodar(comando("dancinha"), internetFalsa());
     assert.equal(resposta.type, RESPOSTA.MENSAGEM);
     assert.equal(resposta.data.flags, 64);
+  });
+});
+
+describe("relógio", () => {
+  it("de hora em hora, dispara o Postar meme no modo agenda", async () => {
+    const chamadas = [];
+    globalThis.fetch = async (url, opcoes) => {
+      chamadas.push({ url, opcoes });
+      return new Response(null, { status: 204 });
+    };
+    const ctx = contexto();
+    await worker.scheduled({}, { RELOGIO_GITHUB_TOKEN: " ghp_teste ", REPOSITORIO: "dono/repo" }, ctx);
+    assert.deepEqual(await Promise.all(ctx.tarefas), [true]);
+    assert.equal(chamadas[0].url, "https://api.github.com/repos/dono/repo/actions/workflows/postar-meme.yml/dispatches");
+    assert.equal(chamadas[0].opcoes.method, "POST");
+    assert.equal(chamadas[0].opcoes.headers.Authorization, "Bearer ghp_teste");
+    assert.ok(chamadas[0].opcoes.headers["User-Agent"]);
+    assert.deepEqual(JSON.parse(chamadas[0].opcoes.body), { ref: "main", inputs: { modo: "agenda" } });
+  });
+
+  it("sem token não faz nada; token recusado ou sem rede não derruba o Worker", async () => {
+    globalThis.fetch = async () => assert.fail("não devia chamar o GitHub");
+    assert.equal(await acordarOBot({ REPOSITORIO: "dono/repo" }), false);
+    globalThis.fetch = async () => new Response('{"message":"Bad credentials"}', { status: 401 });
+    assert.equal(await acordarOBot({ RELOGIO_GITHUB_TOKEN: "x", REPOSITORIO: "dono/repo" }), false);
+    globalThis.fetch = async () => {
+      throw new TypeError("fetch failed");
+    };
+    assert.equal(await acordarOBot({ RELOGIO_GITHUB_TOKEN: "x", REPOSITORIO: "dono/repo" }), false);
   });
 });
 
