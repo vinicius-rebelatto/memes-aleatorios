@@ -142,6 +142,18 @@
       "votos_reddit": 5763,
       "nivel": 5.0,
       "postado_em": "2026-11-22T22:26:14-03:00"
+    },
+    {
+      "id_mensagem": "1574234930223911002",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1y202ek",
+      "subreddit": "HolUp",
+      "titulo": "Crazy comment",
+      "link": "https://redd.it/1y202ek",
+      "imagem": "https://i.redd.it/6kg0zkgblz2i1.png",
+      "votos_reddit": 1589,
+      "nivel": 5.0,
+      "postado_em": "2026-11-22T22:27:33-03:00"
     }
   ],
   "rankings": [
