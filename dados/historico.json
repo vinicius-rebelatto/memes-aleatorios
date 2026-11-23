@@ -172,6 +172,19 @@
       "chave": "estoque/hqdefault.jpg",
       "arquivo": "hqdefault.jpg",
       "postado_em": "2026-11-23T11:28:19-03:00"
+    },
+    {
+      "id_mensagem": "1574524307734794391",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1xzr4yj",
+      "subreddit": "HolUp",
+      "titulo": "Need someone to try this and update pls on the results",
+      "link": "https://redd.it/1xzr4yj",
+      "imagem": "https://i.redd.it/prgicrgltf2i1.png",
+      "votos_reddit": 236,
+      "nivel": 5.0,
+      "nsfw": true,
+      "postado_em": "2026-11-23T17:37:26-03:00"
     }
   ],
   "rankings": [
