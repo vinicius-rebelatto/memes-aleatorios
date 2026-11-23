@@ -21,23 +21,33 @@ import mimetypes
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import requests
 
 from .agenda import descrever_horarios, formatar, janela_aberta, proximo_horario, ranking_na_hora
 from .config import Config, ErroDeConfiguracao, SegredosAusentes, carregar_config, ler_segredos
 from .discord_api import Discord, ErroDiscord
-from .fontes import ErroDeFonte, Meme, buscar_memes, escolher_meme, titulo_util
+from .fontes import (
+    EXTENSOES_DE_IMAGEM,
+    ErroDeFonte,
+    Meme,
+    baixar_imagem,
+    buscar_memes,
+    candidatos_da_fonte,
+    escolher_meme,
+    pontuar,
+)
 from .historico import Historico
 from .moderar import moderar
+from .painel import montar_painel, salvar_painel
 from .ranking import anunciar
 from .termometro import DIAS_CONTANDO_VOTOS, Termometro, numero_br
 from .util import agora, escrever_resumo
 
 MODOS = ("agenda", "agora", "ranking", "simular")
-COR_REDDIT = 0xFF4500
-COR_ESTOQUE = 0x57F287
 PAUSA_ENTRE_REACOES = 0.35  # o Discord limita reações muito seguidas
+SEM_MENCOES = {"parse": []}
 
 
 class SemMemeNovo(Exception):
@@ -56,50 +66,31 @@ class Resultado:
         return bool(self.meme or self.removidos or self.ranking)
 
 
-def legenda_das_reacoes(config: Config) -> str:
-    r = config.reacoes
-    return (
-        f"{r.engracado} engraçado · {r.sem_graca} sem graça · "
-        f"{r.mais_pesado} mais pesado · {r.passou_do_ponto} passou do ponto"
-    )
+def nome_do_arquivo(meme: Meme) -> str:
+    """meme.jpg, meme.png, meme.gif...: a extensão vem do arquivo ou do link da imagem."""
+    origem = meme.arquivo.name if meme.arquivo else meme.imagem.split("?")[0]
+    extensao = Path(origem).suffix.lower().replace(".jpeg", ".jpg")
+    return "meme" + (extensao if extensao in EXTENSOES_DE_IMAGEM else ".jpg")
 
 
-def montar_mensagem(meme: Meme, config: Config, regua: float | None = None) -> tuple[dict, tuple | None]:
-    """Monta a mensagem do Discord. Devolve (corpo, anexo); o anexo só existe para memes do estoque."""
-    partes_do_rodape = []
-    if meme.fonte == "reddit":
-        partes_do_rodape.append(f"⬆️ {meme.votos_reddit} no Reddit")
-    if regua is not None:
-        partes_do_rodape.append(f"🌡️ régua {numero_br(regua)}/5")
-    partes_do_rodape.append(legenda_das_reacoes(config))
-    rodape = {"text": " • ".join(partes_do_rodape)}
+def mensagem_com_link(meme: Meme) -> dict:
+    """Plano B: só o link da imagem, que o Discord também mostra como imagem."""
+    return {"content": meme.imagem, "allowed_mentions": SEM_MENCOES}
 
-    if meme.fonte == "reddit":
-        nome_da_fonte = f"r/{meme.subreddit}"
-        if meme.nsfw:
-            nome_da_fonte = f"🔞 {nome_da_fonte}"
-        embed = {
-            "color": COR_REDDIT,
-            "author": {"name": nome_da_fonte, "url": meme.link},
-            "image": {"url": meme.imagem},
-            "footer": rodape,
-        }
-        titulo = titulo_util(meme.titulo, meme.subreddit)
-        if titulo:
-            embed["title"] = titulo
-            embed["url"] = meme.link
-        return {"embeds": [embed], "allowed_mentions": {"parse": []}}, None
 
-    nome = "meme" + meme.arquivo.suffix.lower()
+def montar_mensagem(meme: Meme, baixar=None) -> tuple[dict, tuple | None]:
+    """Só a imagem: sem moldura, título, link ou rodapé. Devolve (corpo, anexo).
+
+    O meme vai como arquivo anexado, que o Discord mostra solto, só a imagem. Se não der
+    para baixar a imagem do Reddit, vai o link dela.
+    """
+    nome = nome_do_arquivo(meme)
+    conteudo = meme.arquivo.read_bytes() if meme.arquivo else (baixar or baixar_imagem)(meme.imagem)
+    if conteudo is None:
+        return mensagem_com_link(meme), None
     tipo = mimetypes.guess_type(nome)[0] or "application/octet-stream"
-    embed = {
-        "color": COR_ESTOQUE,
-        "author": {"name": "📦 Estoque da galera"},
-        "image": {"url": f"attachment://{nome}"},
-        "footer": rodape,
-    }
-    corpo = {"embeds": [embed], "attachments": [{"id": 0, "filename": nome}], "allowed_mentions": {"parse": []}}
-    return corpo, (nome, meme.arquivo.read_bytes(), tipo)
+    corpo = {"attachments": [{"id": 0, "filename": nome}], "allowed_mentions": SEM_MENCOES}
+    return corpo, (nome, conteudo, tipo)
 
 
 def postar_meme(
@@ -112,8 +103,9 @@ def postar_meme(
     quando: datetime,
     escolher=None,
     log=print,
+    baixar=None,
 ) -> dict:
-    """Escolhe um meme novo, posta com as 4 reações e registra no histórico."""
+    """Escolhe um meme novo, posta só a imagem com as 4 reações e registra no histórico."""
     escolher = escolher or (
         lambda: escolher_meme(config, historico.ja_postado, log=log, termometro=termometro, permitir_nsfw=permitir_nsfw)
     )
@@ -123,8 +115,17 @@ def postar_meme(
             "Não achei nenhum meme novo: a meme-api falhou ou todos os memes recentes já saíram, "
             "e o estoque não tem meme novo."
         )
-    corpo, anexo = montar_mensagem(meme, config, termometro.regua)
-    mensagem = discord.enviar(canal_id, corpo, anexo)
+    corpo, anexo = montar_mensagem(meme, baixar)
+    if anexo is None:
+        log("ℹ️ Não consegui baixar a imagem do Reddit: mandei o link dela (o Discord mostra a imagem igual).")
+    try:
+        mensagem = discord.enviar(canal_id, corpo, anexo)
+    except ErroDiscord as erro:
+        grande_demais = erro.status == 413 or erro.codigo == 40005
+        if anexo is None or not meme.imagem or not grande_demais:
+            raise
+        log("ℹ️ A imagem passou do limite de upload do servidor: mandei o link dela.")
+        mensagem = discord.enviar(canal_id, mensagem_com_link(meme))
     for posicao, emoji in enumerate(config.reacoes.em_ordem()):
         if posicao:
             discord.dormir(PAUSA_ENTRE_REACOES)
@@ -157,6 +158,7 @@ def executar(
     quando: datetime | None = None,
     escolher=None,
     log=print,
+    baixar=None,
 ) -> Resultado:
     """Uma "acordada" do bot. Erros do Discord no meio do caminho são anotados no resultado."""
     quando = quando or agora()
@@ -180,7 +182,7 @@ def executar(
             log("ℹ️ NSFW liberado no config, mas o canal não está marcado como restrito por idade: NSFW fica de fora.")
         try:
             resultado.meme = postar_meme(
-                discord, config, historico, termometro, canal_id, permitir_nsfw, quando, escolher, log
+                discord, config, historico, termometro, canal_id, permitir_nsfw, quando, escolher, log, baixar
             )
             log(f"✅ Meme postado! {descrever_origem(resultado.meme)}")
         except SemMemeNovo as erro:
@@ -216,24 +218,33 @@ def descrever_origem(registro: dict) -> str:
 
 
 def diagnosticar_fontes(config: Config, termometro: Termometro, historico: Historico) -> None:
-    """Mostra, para cada fonte, se a meme-api respondeu e quantos memes novos ela tem."""
-    pesos = {fonte.subreddit: termometro.peso_da_fonte(fonte) for fonte in config.fontes}
-    total = sum(pesos.values()) or 1
+    """Mostra, para cada fonte, se a meme-api respondeu, quantos memes novos ela tem e os melhores."""
+    chances = termometro.chances(config.fontes, config.surpresa)
     print(f"🌡️ Régua: {termometro.descrever_regua()}")
     print(f"⏰ Horários: {descrever_horarios(config.horarios)}\n")
-    print("Fonte                 nível  chance   memes  novos  nsfw")
+    print("Fonte                     nível  chance  memes  novos  nsfw")
+    melhores: list[tuple[str, list[Meme]]] = []
     for fonte in config.fontes:
-        chance = numero_br(100 * pesos[fonte.subreddit] / total) + "%"
+        nivel = numero_br(fonte.nivel) if fonte.segue_a_regua else "fora"
+        inicio = f"r/{fonte.subreddit:<22}  {nivel:>5}  {numero_br(100 * chances[fonte.subreddit]) + '%':>6}"
         try:
             memes = buscar_memes(fonte.subreddit)
         except (requests.RequestException, ErroDeFonte, ValueError) as erro:
-            print(f"r/{fonte.subreddit:<19} {numero_br(fonte.nivel):>5}  {chance:>6}  ❌ {erro}")
+            print(f"{inicio}  ❌ {erro}")
             continue
-        novos = sum(1 for meme in memes if not historico.ja_postado(meme))
-        nsfw = sum(1 for meme in memes if meme.nsfw)
-        linha = f"{len(memes):>5}  {novos:>5}  {nsfw:>4}"
-        print(f"r/{fonte.subreddit:<19} {numero_br(fonte.nivel):>5}  {chance:>6}  {linha}")
-    print("\n(chance = probabilidade de cada fonte ser a primeira tentativa num post normal)\n")
+        novos, id_mais_novo = candidatos_da_fonte(fonte, memes, historico.ja_postado, permitir_nsfw=True)
+        nsfw = sum(1 for meme in novos if meme.nsfw)
+        print(f"{inicio}  {len(memes):>5}  {len(novos):>5}  {nsfw:>4}")
+        novos.sort(key=lambda meme: -pontuar(meme, id_mais_novo))
+        melhores.append((fonte.subreddit, novos[:3]))
+    print("\n(memes = imagens que a meme-api trouxe; novos = inéditas e com menos de 60 dias)")
+    print("(nível fora = fora da régua; chance = de a fonte ser a primeira tentativa do próximo meme)\n")
+    print("Os memes que cada fonte mandaria agora:")
+    for subreddit, memes in melhores:
+        for meme in memes:
+            nsfw = " 🔞" if meme.nsfw else ""
+            print(f"  r/{subreddit} ⬆️{meme.votos_reddit}{nsfw}: {meme.titulo[:80]} — {meme.link}")
+    print()
 
 
 def simular(config: Config, historico: Historico, termometro: Termometro) -> int:
@@ -242,11 +253,15 @@ def simular(config: Config, historico: Historico, termometro: Termometro) -> int
     if meme is None:
         print("❌ Nenhum meme novo encontrado.")
         return 1
-    corpo, anexo = montar_mensagem(meme, config, termometro.regua)
+    corpo, anexo = montar_mensagem(meme)
     print("🧪 Simulação: este seria o próximo post (NSFW desligado na simulação)")
-    print(json.dumps(corpo, ensure_ascii=False, indent=2))
+    origem = {"fonte": meme.fonte, "subreddit": meme.subreddit, "link": meme.link, "arquivo": meme.arquivo}
+    print(f"   {descrever_origem(origem)}")
     if anexo:
-        print(f"(com o arquivo {meme.arquivo})")
+        print(f"   📎 vai só a imagem, como arquivo ({len(anexo[1]) // 1024} KB)")
+    else:
+        print("   🔗 não consegui baixar a imagem: iria o link dela")
+    print(json.dumps(corpo, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -284,8 +299,9 @@ def main(argumentos: list[str] | None = None) -> int:
         print(texto)
         linhas.append(texto)
 
+    quando = agora()
     try:
-        resultado = executar(Discord(token), config, historico, termometro, canal_id, modo, log=log)
+        resultado = executar(Discord(token), config, historico, termometro, canal_id, modo, quando, log=log)
     except ErroDiscord as erro:
         log(f"❌ {erro}")
         escrever_resumo("\n".join(f"- {linha}" for linha in linhas))
@@ -294,6 +310,8 @@ def main(argumentos: list[str] | None = None) -> int:
     if resultado.mudou_algo:
         historico.salvar()
         termometro.salvar()
+    if resultado.mudou_algo or not config.painel.exists():
+        salvar_painel(config.painel, montar_painel(config, termometro, historico, quando))
     escrever_resumo("\n".join(f"- {linha}" for linha in linhas))
     return 1 if resultado.erros else 0
 

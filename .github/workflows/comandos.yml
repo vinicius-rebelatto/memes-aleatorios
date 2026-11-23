@@ -1,0 +1,73 @@
+name: Comandos do Discord
+
+# Publica o Worker da Cloudflare (pasta worker/) que atende /meme, /termometro e /ajuda,
+# liga ele ao Discord e registra os comandos. Roda sozinho quando a pasta worker/ muda;
+# para rodar na mão: Actions → Comandos do Discord → Run workflow.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "worker/**"
+      - ".github/workflows/comandos.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: comandos-do-discord
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    name: Publicar e registrar os comandos
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Conferir os secrets
+        id: secrets
+        env:
+          TEM_CLOUDFLARE: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+          TEM_DISCORD: ${{ secrets.DISCORD_TOKEN != '' }}
+        run: |
+          if [ "$TEM_CLOUDFLARE" = "true" ] && [ "$TEM_DISCORD" = "true" ]; then
+            echo "prontos=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prontos=false" >> "$GITHUB_OUTPUT"
+            aviso="Os comandos ainda não foram ligados: falta configurar os secrets CLOUDFLARE_API_TOKEN e CLOUDFLARE_ACCOUNT_ID (passo 7 do README). Nada foi feito."
+            echo "::notice::$aviso"
+            echo "⚠️ $aviso" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/checkout@v7
+        if: steps.secrets.outputs.prontos == 'true'
+
+      - uses: actions/setup-node@v7
+        if: steps.secrets.outputs.prontos == 'true'
+        with:
+          node-version: "24"
+
+      - name: Testar o Worker
+        if: steps.secrets.outputs.prontos == 'true'
+        working-directory: worker
+        run: node --test
+
+      - name: Publicar o Worker na Cloudflare
+        id: deploy
+        if: steps.secrets.outputs.prontos == 'true'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker
+
+      - name: Ligar o Worker ao Discord e registrar os comandos
+        if: steps.secrets.outputs.prontos == 'true'
+        working-directory: worker
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          WORKER_URL: ${{ steps.deploy.outputs.deployment-url }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node registrar.mjs

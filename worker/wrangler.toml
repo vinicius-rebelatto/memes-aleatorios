@@ -1,0 +1,14 @@
+# Worker da Cloudflare que atende os comandos do Discord (/meme, /termometro e /ajuda).
+# Quem publica é o GitHub Actions (workflow "Comandos do Discord"): não precisa rodar nada.
+name = "memes-aleatorios"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+[vars]
+# Valores públicos (não são segredo): a chave pública do app e o painel que o bot salva.
+DISCORD_PUBLIC_KEY = "d4ee3f3a986a63e9a23c88ec2503f124acd70ce9dd7a0a889fe7be23e08c58c2"
+PAINEL_URL = "https://raw.githubusercontent.com/vinicius-rebelatto/memes-aleatorios/main/dados/painel.json"
+
+[observability]
+enabled = true

@@ -90,6 +90,35 @@ def test_fonte_perto_da_regua_e_com_afinidade_ganha_mais_peso(tmp_path):
     assert termometro.peso_da_fonte(perto) == pytest.approx(2.718, abs=0.01)
 
 
+def test_fonte_sem_nivel_fica_fora_da_regua_mas_segue_os_votos(tmp_path):
+    jogo = Fonte("MinecraftMemes", peso=0.5)
+    for regua in (1.0, 3.0, 5.0):
+        assert Termometro(tmp_path / "t.json", regua=regua).peso_da_fonte(jogo) == pytest.approx(0.5)
+    termometro = Termometro(tmp_path / "t.json", regua=5.0, afinidade={"MinecraftMemes": -2.0})
+    assert termometro.peso_da_fonte(jogo) == pytest.approx(0.5 * 0.368, abs=0.01)  # 😐 derrubam até jogo
+
+
+def test_post_surpresa_ignora_a_regua_mas_nao_os_votos(tmp_path):
+    termometro = Termometro(tmp_path / "t.json", regua=5.0, afinidade={"leve": 2.0})
+    leve = Fonte("leve", nivel=1)
+    assert termometro.peso_da_fonte(leve) < 0.001  # longe da régua
+    assert termometro.peso_surpresa(leve) == pytest.approx(2.718, abs=0.01)
+
+
+def test_chances_juntam_posts_normais_e_surpresa(tmp_path):
+    fontes = (Fonte("pesada", nivel=5), Fonte("leve", nivel=1), Fonte("jogo", peso=0.5))
+    termometro = Termometro(tmp_path / "t.json", regua=5.0)
+    chances = termometro.chances(fontes, surpresa=0.2)
+    assert sum(chances.values()) == pytest.approx(1.0)
+    # normal: pesada 1 x jogo 0,5 (leve ~0); surpresa: 1, 1 e 0,5
+    assert chances["pesada"] == pytest.approx(0.8 * 2 / 3 + 0.2 * 0.4, abs=0.001)
+    assert chances["jogo"] == pytest.approx(0.8 * 1 / 3 + 0.2 * 0.2, abs=0.001)
+    assert chances["leve"] == pytest.approx(0.2 * 0.4, abs=0.001)
+    assert termometro.chances(fontes, surpresa=0) == pytest.approx(
+        {"pesada": 2 / 3, "leve": 0.0, "jogo": 1 / 3}, abs=1e-3
+    )
+
+
 def test_variacao_na_semana_e_desenho_da_regua(tmp_path):
     evolucao = [
         {"quando": "2026-11-10T11:17:00-03:00", "regua": 2.8},
@@ -107,6 +136,8 @@ def test_variacao_na_semana_e_desenho_da_regua(tmp_path):
 def test_fontes_em_alta_e_em_baixa(tmp_path):
     termometro = Termometro(tmp_path / "t.json", afinidade={"a": 1.5, "b": -0.5, "c": 0.0, "d": 0.25})
     assert termometro.fontes_em_destaque() == ([("a", 1.5), ("d", 0.25)], [("b", -0.5)])
+    # fonte que saiu do config.yml não aparece mais
+    assert termometro.fontes_em_destaque(fontes=(Fonte("a"), Fonte("c"))) == ([("a", 1.5)], [])
 
 
 def test_salvar_e_carregar(tmp_path):

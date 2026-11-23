@@ -64,6 +64,15 @@ class Historico:
         """Já saiu algum meme a partir de `momento`?"""
         return any((quando := _ler_data(m.get("postado_em"))) and quando >= momento for m in self.memes)
 
+    def links_desde(self, momento: datetime) -> list[str]:
+        """Links dos posts do Reddit que o bot mandou a partir de `momento`."""
+        return [
+            m["link"]
+            for m in self.memes
+            if m.get("fonte") == "reddit" and m.get("link") and (quando := _ler_data(m.get("postado_em")))
+            if quando >= momento
+        ]
+
     def registrar(self, meme: Meme, id_mensagem: str, quando: datetime) -> dict:
         registro = {
             "id_mensagem": str(id_mensagem),

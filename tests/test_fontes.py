@@ -9,6 +9,7 @@ from bot.config import Fonte
 from bot.fontes import (
     LIMITE_DE_UPLOAD,
     ErroDeFonte,
+    baixar_imagem,
     buscar_memes,
     escolher_do_estoque,
     escolher_do_reddit,
@@ -183,6 +184,61 @@ def test_nsfw_so_entra_quando_permitido_e_conta_como_mais_pesado(config, tmp_pat
         config, nunca_postado, RngFixo(), sessao(), log=calado, termometro=media, permitir_nsfw=True
     )
     assert not meme.nsfw
+
+
+def test_meme_de_fonte_fora_da_regua_nao_tem_nivel(config, tmp_path):
+    config = replace(config, fontes=(Fonte("MinecraftMemes", peso=0.5),))
+    sessao = SessaoPorSubreddit({"MinecraftMemes": resposta_da_api(item_da_api(1, subreddit="MinecraftMemes"))})
+    pesada = Termometro(tmp_path / "t.json", regua=5.0)
+    meme = escolher_do_reddit(config, nunca_postado, RngFixo(), sessao, log=calado, termometro=pesada)
+    assert meme.subreddit == "MinecraftMemes" and meme.nivel is None
+
+
+def test_post_surpresa_ainda_respeita_os_votos_da_galera(config, tmp_path):
+    config = replace(config, surpresa=1.0)
+    sessao = SessaoPorSubreddit({"eu_nvr": resposta_da_api(), "me_irl": resposta_da_api(item_da_api(1))})
+    # eu_nvr tem peso 3, mas levou muito 😐: na surpresa, me_irl vem primeiro
+    termometro = Termometro(tmp_path / "t.json", afinidade={"eu_nvr": -3.0})
+    escolher_do_reddit(config, nunca_postado, RngFixo(), sessao, log=calado, termometro=termometro)
+    assert sessao.pedidos[0] == "me_irl"
+
+
+class SessaoDeImagem:
+    def __init__(self, resposta):
+        self.resposta = resposta
+        self.urls = []
+
+    def get(self, url, **opcoes):
+        self.urls.append(url)
+        if isinstance(self.resposta, Exception):
+            raise self.resposta
+        return self.resposta
+
+
+def imagem(status=200, conteudo=b"png", tipo="image/png"):
+    resposta = RespostaFalsa(status, headers={"Content-Type": tipo})
+    resposta.content = conteudo
+    return resposta
+
+
+def test_baixar_imagem_devolve_os_bytes():
+    sessao = SessaoDeImagem(imagem())
+    assert baixar_imagem("https://i.redd.it/a.png", sessao) == b"png"
+    assert sessao.urls == ["https://i.redd.it/a.png"]
+
+
+@pytest.mark.parametrize(
+    "resposta",
+    [
+        imagem(status=404),
+        imagem(tipo="text/html; charset=utf-8", conteudo=b"<html>removido</html>"),
+        imagem(conteudo=b""),
+        imagem(conteudo=b"x" * (LIMITE_DE_UPLOAD + 1)),
+        requests.ConnectionError("sem rede"),
+    ],
+)
+def test_baixar_imagem_falha_sem_derrubar_nada(resposta):
+    assert baixar_imagem("https://i.redd.it/a.png", SessaoDeImagem(resposta)) is None
 
 
 def test_ordem_das_fontes_respeita_os_pesos():

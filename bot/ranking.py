@@ -67,16 +67,18 @@ def descrever(colocado: Colocado) -> str:
     return "meme do estoque da galera"
 
 
-def resumo_do_termometro(termometro: Termometro, inicio: datetime) -> str:
-    variacao = termometro.variacao_desde(inicio)
+def como_andou(variacao: float) -> str:
     if abs(variacao) < 0.05:
-        andou = "ficou parada"
-    elif variacao > 0:
-        andou = f"🌶️ subiu {numero_br(variacao)}"
-    else:
-        andou = f"🧊 desceu {numero_br(-variacao)}"
+        return "ficou parada"
+    if variacao > 0:
+        return f"🌶️ subiu {numero_br(variacao)}"
+    return f"🧊 desceu {numero_br(-variacao)}"
+
+
+def resumo_do_termometro(termometro: Termometro, inicio: datetime, fontes=None) -> str:
+    andou = como_andou(termometro.variacao_desde(inicio))
     linhas = [f"Régua: **{termometro.descrever_regua()}** ({andou} na semana)"]
-    em_alta, em_baixa = termometro.fontes_em_destaque()
+    em_alta, em_baixa = termometro.fontes_em_destaque(fontes=fontes)
     if em_alta:
         linhas.append("Em alta: " + ", ".join(f"r/{fonte}" for fonte, _ in em_alta))
     if em_baixa:
@@ -93,6 +95,7 @@ def montar_anuncio(
     fim: datetime,
     pasta_estoque: Path,
     termometro: Termometro | None = None,
+    fontes=None,
 ) -> tuple[dict, tuple | None]:
     if colocados:
         linhas = []
@@ -112,7 +115,8 @@ def montar_anuncio(
         "footer": {"text": f"Votação de {inicio:%d/%m} a {fim:%d/%m} • vote com {emoji} nos memes da semana"},
     }
     if termometro is not None:
-        embed["fields"] = [{"name": "🌡️ Termômetro da galera", "value": resumo_do_termometro(termometro, inicio)}]
+        resumo = resumo_do_termometro(termometro, inicio, fontes)
+        embed["fields"] = [{"name": "🌡️ Termômetro da galera", "value": resumo}]
     corpo = {"embeds": [embed], "allowed_mentions": {"parse": []}}
     anexo = None
 
@@ -157,6 +161,7 @@ def anunciar(
         quando,
         config.estoque_pasta,
         termometro,
+        config.fontes,
     )
     mensagem = discord.enviar(canal_id, corpo, anexo)
     historico.registrar_ranking(mensagem["id"], quando)

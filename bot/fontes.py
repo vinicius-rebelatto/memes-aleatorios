@@ -113,6 +113,20 @@ def buscar_memes(subreddit: str, sessao=None, quantidade: int = QUANTIDADE_POR_B
     return memes
 
 
+def baixar_imagem(url: str, sessao=None, limite: int = LIMITE_DE_UPLOAD) -> bytes | None:
+    """Baixa a imagem do meme para postar como arquivo. None se falhar ou passar do limite do Discord."""
+    sessao = sessao or requests
+    try:
+        resposta = sessao.get(url, headers={"User-Agent": "memes-aleatorios (bot de Discord)"}, timeout=30)
+    except requests.RequestException:
+        return None
+    tipo = str(resposta.headers.get("Content-Type", "")).lower()
+    conteudo = resposta.content or b""
+    if resposta.status_code != 200 or not tipo.startswith("image/") or not 0 < len(conteudo) <= limite:
+        return None
+    return conteudo
+
+
 def idade_em_dias(meme: Meme, id_mais_novo: int | None) -> float | None:
     if meme.id_reddit is None or id_mais_novo is None:
         return None
@@ -128,6 +142,28 @@ def pontuar(meme: Meme, id_mais_novo: int | None, regua: float | None = None) ->
     if regua is not None and meme.nivel is not None:
         pontos *= proximidade(meme.nivel, regua)
     return pontos
+
+
+def candidatos_da_fonte(
+    fonte: Fonte, memes: list[Meme], ja_postado: Callable[[Meme], bool], permitir_nsfw: bool
+) -> tuple[list[Meme], int | None]:
+    """Os memes que podem sair: inéditos, recentes e (se o canal não for +18) sem NSFW.
+
+    Devolve (candidatos, id do post mais novo da busca), que serve para calcular a idade.
+    """
+    ids = [meme.id_reddit for meme in memes if meme.id_reddit is not None]
+    id_mais_novo = max(ids) if ids else None
+    candidatos = []
+    for meme in memes:
+        idade = idade_em_dias(meme, id_mais_novo)
+        if ja_postado(meme) or (meme.nsfw and not permitir_nsfw):
+            continue
+        if idade is not None and idade > IDADE_MAXIMA_DIAS:
+            continue
+        if fonte.segue_a_regua:
+            meme.nivel = min(5.0, fonte.nivel + (1 if meme.nsfw else 0))
+        candidatos.append(meme)
+    return candidatos, id_mais_novo
 
 
 def ordem_das_fontes(fontes: tuple[Fonte, ...], pesos: dict[str, float], rng) -> list[Fonte]:
@@ -150,10 +186,11 @@ def escolher_do_reddit(
     permitir_nsfw: bool = False,
 ):
     surpresa = termometro is None or rng.random() < config.surpresa
-    if surpresa:
+    if termometro is None:
         pesos = {fonte.subreddit: fonte.peso for fonte in config.fontes}
-        if termometro is not None:
-            log("🎲 Post surpresa: sorteando qualquer fonte, sem olhar a régua.")
+    elif surpresa:
+        log("🎲 Post surpresa: sorteando a fonte sem olhar a régua.")
+        pesos = {fonte.subreddit: termometro.peso_surpresa(fonte) for fonte in config.fontes}
     else:
         pesos = {fonte.subreddit: termometro.peso_da_fonte(fonte) for fonte in config.fontes}
     regua = None if surpresa else termometro.regua
@@ -164,17 +201,7 @@ def escolher_do_reddit(
         except (requests.RequestException, ErroDeFonte, ValueError) as erro:
             log(f"⚠️ Não consegui buscar memes de r/{fonte.subreddit}: {erro}")
             continue
-        ids = [meme.id_reddit for meme in memes if meme.id_reddit is not None]
-        id_mais_novo = max(ids) if ids else None
-        candidatos = []
-        for meme in memes:
-            idade = idade_em_dias(meme, id_mais_novo)
-            if ja_postado(meme) or (meme.nsfw and not permitir_nsfw):
-                continue
-            if idade is not None and idade > IDADE_MAXIMA_DIAS:
-                continue
-            meme.nivel = fonte.nivel + (1 if meme.nsfw else 0)
-            candidatos.append(meme)
+        candidatos, id_mais_novo = candidatos_da_fonte(fonte, memes, ja_postado, permitir_nsfw)
         if candidatos:
             return max(candidatos, key=lambda meme: pontuar(meme, id_mais_novo, regua))
         log(f"ℹ️ r/{fonte.subreddit}: nenhum meme novo agora (todos já saíram ou foram filtrados).")

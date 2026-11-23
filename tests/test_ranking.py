@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 from conftest import DiscordFalso, reacao
 
+from bot.config import Fonte
 from bot.fontes import Meme
 from bot.historico import Historico
 from bot.ranking import anunciar, calcular_ranking, montar_anuncio
@@ -113,6 +114,13 @@ def test_anuncio_mostra_o_termometro_da_semana(tmp_path):
         "Em alta: r/HUEstation",
         "Em baixa: r/dankmemes",
     ]
+
+
+def test_anuncio_nao_cita_fonte_que_saiu_do_config(tmp_path):
+    termometro = Termometro(tmp_path / "t.json", afinidade={"ShitpostBR": -1.0, "eu_nvr": 0.5})
+    corpo, _ = montar_anuncio([], "111", "555", "😂", INICIO, FIM, tmp_path, termometro, (Fonte("eu_nvr", 3),))
+    assert "ShitpostBR" not in corpo["embeds"][0]["fields"][0]["value"]
+    assert "Em alta: r/eu_nvr" in corpo["embeds"][0]["fields"][0]["value"]
 
 
 def test_anunciar_posta_e_registra_no_historico(config, tmp_path):

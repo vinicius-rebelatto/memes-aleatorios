@@ -1,12 +1,14 @@
 # 🤖 Memes Aleatórios
 
-Automação que posta **memes brasileiros** no canal `#memes-aleatorios` do nosso Discord, com votação,
-**Meme da Semana** e um **algoritmo da galera**: as reações de todo mundo decidem que tipo de meme vem depois.
-Roda de graça no GitHub Actions: não tem servidor, nem nada ligado o tempo todo.
+Automação que posta memes no canal `#memes-aleatorios` do nosso Discord (brasileiros, de humor mais pesado e de
+jogos), com votação, **Meme da Semana**, comandos (`/meme`, `/termometro`, `/ajuda`) e um **algoritmo da galera**:
+as reações de todo mundo decidem que tipo de meme vem depois. Roda de graça no GitHub Actions e na Cloudflare:
+não tem servidor, nem nada ligado o tempo todo.
 
 ## Como funciona
 
-**18 memes por dia, de hora em hora, das 9h às 2h da manhã** (horário de Brasília). Cada meme chega com 4 reações:
+**18 memes por dia, de hora em hora, das 9h às 2h da manhã** (horário de Brasília). O meme chega **só a imagem**,
+sem moldura, título ou texto, com 4 reações:
 
 | Reação | Significa         | O que muda                                                     |
 | ------ | ----------------- | -------------------------------------------------------------- |
@@ -21,24 +23,32 @@ Roda de graça no GitHub Actions: não tem servidor, nem nada ligado o tempo tod
   Ele mesmo confere a hora, então **nunca posta entre 2h e 9h nem posta dois memes no mesmo horário**, mesmo que
   seja acordado atrasado ou mais de uma vez.
 - De vez em quando (20%) ele posta do [estoque da galera](#-estoque-da-galera).
+- Comandos: `/meme` manda um meme na hora, `/termometro` mostra a régua e `/ajuda` explica as reações
+  (veja o [passo 7](#7-comandos-meme-termometro-e-ajuda)).
+
+> 💡 Sugestão de tópico para o canal (Editar canal → Tópico): *Meme de hora em hora 🤖 Reaja: 😂 engraçado ·
+> 😐 sem graça · 🌶️ mais pesado · 🚫 passou do ponto (3 🚫 apagam). /meme pede um na hora, /termometro mostra a régua.*
 
 ### 🌡️ O algoritmo da galera
 
-Cada fonte de memes (um subreddit brasileiro) tem um **nível de peso**, de 1 (leve) a 5 (pesado):
+Cada fonte de memes (um subreddit) tem um **nível de peso**, de 1 (leve) a 5 (pesado):
 
-| Nível | Fontes                           |
-| ----- | -------------------------------- |
-| 2     | r/DiretoDoZapZap, r/MemesBR      |
-| 3     | r/HUEstation, r/eu_nvr           |
-| 4     | r/ShitpostBR                     |
-| 5     | r/circojeca                      |
+| Nível          | Fontes                                                      |
+| -------------- | ----------------------------------------------------------- |
+| 2              | r/DiretoDoZapZap, r/MemesBR                                 |
+| 3              | r/HUEstation                                                |
+| 4              | r/eu_nvr, r/dankmemes                                       |
+| 5              | r/circojeca, r/HolUp                                        |
+| 🎮 fora da régua | r/leagueofmemes, r/MinecraftMemes, r/dontstarve (jogos)    |
 
-- A **régua** começa no meio (3). Cada 🌶️ empurra ela um pouco pra cima e cada 🚫, pra baixo.
+- A **régua** sobe um pouco a cada 🌶️ e desce a cada 🚫.
 - Na hora de escolher, o bot prefere as fontes com nível **perto da régua** e com mais 😂 do que 😐.
+- As fontes de **jogos ficam fora da régua**: saem sempre na mesma proporção (cerca de 1 em cada 4 memes),
+  mas os 😂 e 😐 também valem para elas.
 - Dentro da fonte, ele pega o meme **mais votado entre os recentes**: post velho não ganha de post do momento.
-- **1 em cada 5 posts é surpresa**: ignora a régua e sorteia qualquer fonte, para o algoritmo não ficar
-  viciado e perceber quando o gosto da galera muda.
-- A régua atual aparece no rodapé de cada meme (🌡️ régua 3,2/5) e no anúncio de domingo.
+- **1 em cada 5 posts é surpresa**: ignora a régua (mas não os 😂 e 😐) e sorteia a fonte, para o algoritmo
+  não ficar viciado e perceber quando o gosto da galera muda.
+- A régua não aparece nos memes: quem quiser ver usa `/termometro`, e ela sai também no anúncio de domingo.
 
 O estado do algoritmo fica em `dados/termometro.json` e o que já foi postado em `dados/historico.json`
 (é por isso que meme não repete). O bot atualiza os dois sozinho.
@@ -50,6 +60,9 @@ alta a régua, mais chance de aparecer. Mas o Discord só permite conteúdo adul
 restrito por idade, então o bot **só posta NSFW se o canal estiver marcado assim**. Para ligar:
 **Editar canal → Visão geral → Canal com restrição de idade**. Quem abrir o canal vai precisar confirmar que
 tem 18 anos ou mais. Sem essa marcação, o bot simplesmente deixa os NSFW de fora.
+
+No `/meme` vale a mesma regra, com um detalhe: NSFW só vem das fontes do `config.yml`. Um subreddit escolhido na
+hora (`/meme subreddit:...`) nunca traz post NSFW, nem em canal restrito.
 
 ## Instalação (uma vez só)
 
@@ -68,7 +81,7 @@ tem 18 anos ou mais. Sem essa marcação, o bot simplesmente deixa os NSFW de fo
 Abra este link trocando `SEU_APPLICATION_ID` pelo ID do passo 1:
 
 ```
-https://discord.com/oauth2/authorize?client_id=SEU_APPLICATION_ID&scope=bot&permissions=117824
+https://discord.com/oauth2/authorize?client_id=SEU_APPLICATION_ID&scope=bot+applications.commands&permissions=117824
 ```
 
 Escolha o servidor e clique em **Autorizar**. O link já pede só o que o bot usa: ver canais, enviar mensagens,
@@ -127,13 +140,54 @@ Gere e copie o token. Ele só consegue disparar os workflows deste repositório 
 Salve e use **Test run**: a resposta deve ser `204` e uma execução nova aparece na aba **Actions**. Pronto:
 o bot passa a acordar pontualmente. O agendamento do GitHub continua lá como reserva.
 
+### 7. Comandos `/meme`, `/termometro` e `/ajuda`
+
+| Comando                         | O que faz                                                                           |
+| ------------------------------- | ----------------------------------------------------------------------------------- |
+| `/meme`                         | Manda um meme na hora, sorteado pelo algoritmo da galera (só a imagem)              |
+| `/meme subreddit:MinecraftMemes` | Manda um meme de um subreddit escolhido (as fontes do `config.yml` aparecem como sugestão) |
+| `/termometro`                   | Mostra a régua, a chance de cada fonte e quem está em alta e em baixa              |
+| `/ajuda`                        | Explica as reações e os comandos (só quem pediu vê)                                 |
+
+Os memes do `/meme` são extras: não mexem no termômetro e não concorrem ao Meme da Semana.
+
+Os comandos rodam num **Worker da Cloudflare**, de graça (o plano grátis aguenta 100 mil comandos por dia).
+Quem publica o Worker, liga ele ao Discord e registra os comandos é o GitHub Actions; você só cria a conta e
+cola dois secrets. Leva uns 10 minutos.
+
+**a) Conta.** Crie uma conta grátis em <https://dash.cloudflare.com/sign-up> e confirme o e-mail.
+
+**b) Endereço workers.dev.** No painel da Cloudflare, abra **Workers & Pages** (menu da esquerda) uma vez.
+Isso cria o seu endereço `*.workers.dev`. Não precisa criar nenhum Worker lá.
+
+**c) Account ID.** Ainda em **Workers & Pages**, copie o **Account ID** que aparece na lateral (ou, na página
+inicial da conta, menu **⋯** ao lado do nome da conta → **Copy account ID**).
+
+**d) Token.** Clique na sua foto (canto superior direito) → **Profile → API Tokens → Create Token**, e no modelo
+**Edit Cloudflare Workers** clique em **Use template**. Em *Account Resources* escolha a sua conta e deixe
+*Zone Resources* como está. **Continue to summary → Create Token** e copie o token (ele só aparece uma vez).
+
+**e) Secrets.** No GitHub, no mesmo lugar do passo 4, crie mais dois:
+
+| Name                    | Secret                     |
+| ----------------------- | -------------------------- |
+| `CLOUDFLARE_API_TOKEN`  | o token do item d          |
+| `CLOUDFLARE_ACCOUNT_ID` | o Account ID do item c     |
+
+**f) Ligar.** Aba **Actions → Comandos do Discord → Run workflow**. Em um ou dois minutos o log termina com
+`✅ Comandos registrados: /meme, /termometro, /ajuda`. Digite `/` no Discord para ver os comandos (se não
+aparecerem, aperte `Ctrl+R` para recarregar o Discord).
+
+> O workflow também preenche sozinho o campo **Interactions Endpoint URL** do app no portal do Discord. Não
+> precisa mexer lá. Sempre que a pasta `worker/` mudar, ele publica de novo sozinho.
+
 ## Personalizar
 
 | Quero mudar...                              | Onde                                                  |
 | ------------------------------------------- | ----------------------------------------------------- |
 | Horários dos memes                          | `config.yml` → `agenda.horarios`                      |
 | Dia e hora do Meme da Semana                | `config.yml` → `ranking.dia` e `ranking.horario`      |
-| Fontes, o nível de cada uma e o peso        | `config.yml` → `fontes`                               |
+| Fontes, o nível de cada uma e o peso        | `config.yml` → `fontes` (sem `nivel` = fora da régua) |
 | Os emojis das 4 reações                     | `config.yml` → `reacoes`                              |
 | Onde a régua começa e a chance de surpresa  | `config.yml` → `termometro`                           |
 | Liberar ou bloquear NSFW                    | `config.yml` → `nsfw.permitir`                        |
@@ -145,8 +199,10 @@ acorda de hora em hora, os horários podem ser qualquer hora cheia ou quebrada (
 na primeira acordada dentro da janela de cada horário.
 
 **Quer memes mais pesados ou mais leves do que a lista permite?** A régua só vai até as fontes da lista:
-adicione fontes novas com o nível certo em `config.yml` e rode o **Postar meme** no modo **simular** para ver
-se a fonte nova funciona.
+adicione fontes novas com o nível certo em `config.yml` e rode o **Postar meme** no modo **simular**. O log
+mostra se cada fonte funciona, quantos memes novos ela tem e os títulos dos que ela mandaria agora. Mais
+jogos? Adicione o subreddit sem `nivel` e com `peso: 0.5`, como os outros jogos. Os comandos acompanham o
+`config.yml` sozinhos, a partir do próximo post do bot.
 
 ## 📦 Estoque da galera
 
@@ -172,6 +228,11 @@ O resultado de cada execução aparece na aba **Actions** (clique na execução 
 | ❌ Não achei nenhum meme novo                    | A meme-api pode estar fora do ar. Se continuar, adicione outra fonte ou memes no estoque.       |
 | ℹ️ NSFW fica de fora                             | Normal: o canal não está marcado como restrito por idade (veja [NSFW](#-nsfw)).                 |
 | cron-job.org mostra erro `401`, `403` ou `404`   | Token errado, sem a permissão *Actions: Read and write*, vencido, ou URL digitada errada.        |
+| ⚠️ Os comandos ainda não foram ligados          | Faça o [passo 7](#7-comandos-meme-termometro-e-ajuda).                                          |
+| Comandos não aparecem no Discord                 | Aperte `Ctrl+R` no Discord e confira se o **Comandos do Discord** terminou com ✅. Se ainda não aparecerem, convide o bot de novo com o link do passo 2. |
+| "O aplicativo não respondeu" ao usar um comando  | Rode **Actions → Comandos do Discord → Run workflow** de novo: ele religa o Worker ao Discord.   |
+| Comandos do Discord falha com `workers.dev`      | Faltou o item b do passo 7 (abrir **Workers & Pages** uma vez).                                 |
+| Comandos do Discord falha com `Authentication error` | O token da Cloudflare está errado ou sem permissão: refaça o item d do passo 7.           |
 
 Também é normal:
 
@@ -184,6 +245,7 @@ Também é normal:
 pip install -r requirements-dev.txt
 python -m bot.postar --modo simular   # testa as fontes e mostra o próximo meme, sem mexer no Discord
 python -m pytest                      # roda os testes
+cd worker && node --test              # testes dos comandos (precisa do Node 22 ou mais novo)
 ```
 
 ## Como o código está organizado
@@ -196,7 +258,9 @@ python -m pytest                      # roda os testes
 | `bot/fontes.py`        | Busca memes na [meme-api](https://github.com/D3vd/Meme_Api) e no estoque e escolhe o melhor |
 | `bot/moderar.py`       | Apaga os memes do bot que levaram 🚫 suficientes                             |
 | `bot/ranking.py`       | Conta os 😂 da semana e monta o anúncio com o termômetro                     |
+| `bot/painel.py`        | Grava `dados/painel.json`, o resumo do termômetro que os comandos leem       |
 | `bot/historico.py`     | Lê e grava `dados/historico.json`                                            |
 | `bot/discord_api.py`   | Conversa com a API do Discord                                                |
 | `bot/config.py`        | Lê o `config.yml` e os secrets                                               |
-| `.github/workflows/`   | `postar-meme.yml` (o bot, de hora em hora) e `testes.yml`                    |
+| `worker/`              | Os comandos do Discord (Worker da Cloudflare): `src/index.js` atende os comandos, `comandos.json` os define e `registrar.mjs` liga tudo ao Discord |
+| `.github/workflows/`   | `postar-meme.yml` (o bot, de hora em hora), `comandos.yml` (publica os comandos) e `testes.yml` |

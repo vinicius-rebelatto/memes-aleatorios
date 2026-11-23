@@ -12,8 +12,8 @@ from bot.postar import executar, main, montar_mensagem
 from bot.termometro import Termometro
 
 BRT = timezone(timedelta(hours=-3))
-LEGENDA = "😂 engraçado · 😐 sem graça · 🌶️ mais pesado · 🚫 passou do ponto"
 calado = lambda *_: None
+baixou = lambda url: b"png"  # imita o download da imagem, sem internet
 
 
 def em(hora: int, minuto: int = 0, dia: int = 22) -> datetime:
@@ -34,46 +34,64 @@ def meme_do_reddit(titulo="eu_nvr", nsfw=False, numero=1):
     )
 
 
-def rodar(config, tmp_path, modo, quando, discord=None, historico=None, termometro=None, escolher=None, log=calado):
+def rodar(
+    config,
+    tmp_path,
+    modo,
+    quando,
+    discord=None,
+    historico=None,
+    termometro=None,
+    escolher=None,
+    log=calado,
+    baixar=baixou,
+):
     discord = discord or DiscordFalso()
     historico = historico or Historico(tmp_path / "h.json")
     termometro = termometro or Termometro(tmp_path / "t.json")
     escolher = escolher or meme_do_reddit
-    resultado = executar(discord, config, historico, termometro, "555", modo, quando, escolher, log)
+    resultado = executar(discord, config, historico, termometro, "555", modo, quando, escolher, log, baixar)
     return resultado, discord, historico, termometro
 
 
 # ---- a mensagem ---------------------------------------------------------------------
 
 
-def test_mensagem_do_reddit_tem_imagem_fonte_regua_e_legenda(config):
-    corpo, anexo = montar_mensagem(meme_do_reddit(), config, regua=3.35)
-    embed = corpo["embeds"][0]
+def test_meme_do_reddit_vai_so_a_imagem_como_arquivo():
+    pedidos = []
+    corpo, anexo = montar_mensagem(meme_do_reddit("quando o deploy é sexta"), lambda url: pedidos.append(url) or b"png")
+    assert pedidos == ["https://i.redd.it/abc1.png"]
+    assert corpo == {"attachments": [{"id": 0, "filename": "meme.png"}], "allowed_mentions": {"parse": []}}
+    assert anexo == ("meme.png", b"png", "image/png")  # sem moldura, título, link ou rodapé
+
+
+def test_sem_conseguir_baixar_vai_so_o_link_da_imagem():
+    corpo, anexo = montar_mensagem(meme_do_reddit(nsfw=True), lambda url: None)
+    assert corpo == {"content": "https://i.redd.it/abc1.png", "allowed_mentions": {"parse": []}}
     assert anexo is None
-    assert embed["image"] == {"url": "https://i.redd.it/abc1.png"}
-    assert embed["author"] == {"name": "r/eu_nvr", "url": "https://redd.it/abc1"}
-    assert "title" not in embed  # o título só repetia o nome do subreddit
-    assert embed["footer"]["text"] == f"⬆️ 744 no Reddit • 🌡️ régua 3,4/5 • {LEGENDA}"
-    assert corpo["allowed_mentions"] == {"parse": []}
 
 
-def test_titulo_informativo_aparece_e_nsfw_ganha_aviso(config):
-    corpo, _ = montar_mensagem(meme_do_reddit("quando o deploy é sexta", nsfw=True), config)
-    embed = corpo["embeds"][0]
-    assert embed["title"] == "quando o deploy é sexta"
-    assert embed["url"] == "https://redd.it/abc1"
-    assert embed["author"]["name"] == "🔞 r/eu_nvr"
-
-
-def test_mensagem_do_estoque_envia_o_arquivo(config):
-    arquivo = config.estoque_pasta / "Zoeira Boa.JPG"
+def test_meme_do_estoque_vai_so_o_arquivo(config):
+    arquivo = config.estoque_pasta / "Zoeira Boa.JPEG"
     arquivo.write_bytes(b"jpg")
-    meme = Meme(fonte="estoque", chave="estoque/Zoeira Boa.JPG", arquivo=arquivo)
-    corpo, anexo = montar_mensagem(meme, config)
+    meme = Meme(fonte="estoque", chave="estoque/Zoeira Boa.JPEG", arquivo=arquivo)
+    corpo, anexo = montar_mensagem(meme, lambda url: pytest.fail("não precisa baixar nada"))
     assert anexo == ("meme.jpg", b"jpg", "image/jpeg")
-    assert corpo["embeds"][0]["image"] == {"url": "attachment://meme.jpg"}
-    assert corpo["embeds"][0]["footer"]["text"] == LEGENDA
-    assert corpo["attachments"] == [{"id": 0, "filename": "meme.jpg"}]
+    assert corpo == {"attachments": [{"id": 0, "filename": "meme.jpg"}], "allowed_mentions": {"parse": []}}
+
+
+def test_imagem_grande_demais_para_o_servidor_vai_como_link(config, tmp_path):
+    class DiscordSemEspaco(DiscordFalso):
+        def enviar(self, canal_id, corpo, anexo=None):
+            if anexo is not None:
+                raise ErroDiscord(413, 40005, "Request entity too large", "POST")
+            return super().enviar(canal_id, corpo, anexo)
+
+    avisos = []
+    resultado, discord, _, _ = rodar(config, tmp_path, "agora", em(12), discord=DiscordSemEspaco(), log=avisos.append)
+    assert discord.enviadas[0]["corpo"]["content"] == "https://i.redd.it/abc1.png"
+    assert len(discord.reacoes) == 4 and not resultado.erros
+    assert any("limite de upload" in aviso for aviso in avisos)
 
 
 # ---- modo agora (botão) --------------------------------------------------------------
@@ -82,6 +100,7 @@ def test_mensagem_do_estoque_envia_o_arquivo(config):
 def test_modo_agora_posta_com_as_4_reacoes_mesmo_fora_de_hora(config, tmp_path):
     resultado, discord, historico, _ = rodar(config, tmp_path, "agora", em(3, 0))
     assert len(discord.enviadas) == 1
+    assert discord.enviadas[0]["anexo"] == ("meme.png", b"png", "image/png")
     assert discord.reacoes == [("5001", "😂"), ("5001", "😐"), ("5001", "🌶️"), ("5001", "🚫")]
     assert discord.dormidas == [0.35, 0.35, 0.35]
     assert resultado.meme["id_mensagem"] == "5001"
@@ -172,8 +191,7 @@ def test_votos_da_galera_mexem_na_regua_antes_do_post(config, tmp_path):
 
     assert termometro.regua == pytest.approx(3.3)
     assert termometro.afinidade == {"eu_nvr": pytest.approx(0.25)}
-    rodape = discord.enviadas[0]["corpo"]["embeds"][0]["footer"]["text"]
-    assert "🌡️ régua 3,3/5" in rodape
+    assert "embeds" not in discord.enviadas[0]["corpo"]  # o termômetro não aparece no post
 
 
 def test_meme_apagado_fora_de_hora_tambem_conta_como_mudanca(config, tmp_path):
@@ -251,11 +269,14 @@ def test_modo_invalido_e_recusado():
 
 
 def test_simular_testa_as_fontes_e_mostra_o_post_sem_usar_o_discord(monkeypatch, capsys):
-    monkeypatch.setattr(modulo_postar, "buscar_memes", lambda subreddit: [meme_do_reddit()])
+    monkeypatch.setattr(modulo_postar, "buscar_memes", lambda subreddit: [meme_do_reddit("quando o deploy é sexta")])
     monkeypatch.setattr(modulo_postar, "escolher_meme", lambda *args, **kwargs: meme_do_reddit())
+    monkeypatch.setattr(modulo_postar, "baixar_imagem", lambda url: b"x" * 3000)
     assert main(["--modo", "simular"]) == 0
     saida = capsys.readouterr().out
     assert "r/eu_nvr" in saida and "r/circojeca" in saida  # tabela de diagnóstico das fontes
-    assert "⏰ Horários: de hora em hora, das 9h às 2h" in saida
+    assert "⏰ Horários:" in saida
+    assert "⬆️744: quando o deploy é sexta — https://redd.it/abc1" in saida  # os mais votados de cada fonte
+    assert "📎 vai só a imagem, como arquivo (2 KB)" in saida
     corpo = json.loads(saida[saida.index("{", saida.index("🧪")) :])
-    assert corpo["embeds"][0]["image"]["url"] == "https://i.redd.it/abc1.png"
+    assert corpo["attachments"] == [{"id": 0, "filename": "meme.png"}]

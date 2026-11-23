@@ -29,8 +29,12 @@ class SegredosAusentes(ErroDeConfiguracao):
 @dataclass(frozen=True)
 class Fonte:
     subreddit: str
-    nivel: float = 3.0  # 1 = leve ... 5 = pesado
+    nivel: float | None = None  # 1 = leve ... 5 = pesado; None = fora da régua (ex.: memes de jogo)
     peso: float = 1.0
+
+    @property
+    def segue_a_regua(self) -> bool:
+        return self.nivel is not None
 
 
 @dataclass(frozen=True)
@@ -67,6 +71,7 @@ class Config:
     estoque_chance: float = 0.2
     historico: Path = RAIZ / "dados" / "historico.json"
     termometro: Path = RAIZ / "dados" / "termometro.json"
+    painel: Path = RAIZ / "dados" / "painel.json"
     horarios: tuple[time, ...] = HORARIOS_PADRAO
     tolerancia: timedelta = timedelta(minutes=120)
     ranking_dia: int = 6  # 0 = segunda ... 6 = domingo
@@ -150,7 +155,8 @@ def _ler_fontes(dados: dict) -> tuple[Fonte, ...]:
         peso = _numero(item.get("peso", 1), f"peso de r/{nome}")
         if peso <= 0:
             raise ErroDeConfiguracao(f"O peso de r/{nome} precisa ser maior que zero.")
-        fontes.append(Fonte(nome, _nivel(item.get("nivel", 3), f"nivel de r/{nome}"), peso))
+        nivel = item.get("nivel")  # sem nível = fonte fora da régua
+        fontes.append(Fonte(nome, None if nivel is None else _nivel(nivel, f"nivel de r/{nome}"), peso))
     if not fontes:
         raise ErroDeConfiguracao("O config.yml precisa ter pelo menos uma fonte em 'fontes'.")
     return tuple(fontes)
@@ -215,6 +221,7 @@ def carregar_config(caminho: Path | str = CONFIG_PADRAO) -> Config:
         estoque_chance=_fracao(estoque.get("chance", 0.2), "estoque.chance"),
         historico=caminho.parent / "dados" / "historico.json",
         termometro=caminho.parent / "dados" / "termometro.json",
+        painel=caminho.parent / "dados" / "painel.json",
     )
 
 

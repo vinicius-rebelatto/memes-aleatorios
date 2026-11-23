@@ -1,0 +1,33 @@
+[
+  {
+    "name": "meme",
+    "type": 1,
+    "description": "Manda um meme agora",
+    "contexts": [0],
+    "integration_types": [0],
+    "options": [
+      {
+        "type": 3,
+        "name": "subreddit",
+        "description": "De qual subreddit (opcional). Ex.: MinecraftMemes",
+        "required": false,
+        "autocomplete": true,
+        "max_length": 30
+      }
+    ]
+  },
+  {
+    "name": "termometro",
+    "type": 1,
+    "description": "Mostra a régua de peso e as fontes favoritas da galera",
+    "contexts": [0],
+    "integration_types": [0]
+  },
+  {
+    "name": "ajuda",
+    "type": 1,
+    "description": "Explica as reações e os comandos do bot de memes",
+    "contexts": [0],
+    "integration_types": [0]
+  }
+]

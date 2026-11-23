@@ -6,33 +6,40 @@ from bot.config import ErroDeConfiguracao, SegredosAusentes, carregar_config, le
 
 
 def test_config_do_repositorio_carrega():
+    # só confere que o config.yml é válido: mudar fontes e horários não deve quebrar os testes
     config = carregar_config()
-    niveis = {fonte.subreddit: fonte.nivel for fonte in config.fontes}
-    assert niveis == {
-        "DiretoDoZapZap": 2,
-        "MemesBR": 2,
-        "HUEstation": 3,
-        "eu_nvr": 3,
-        "ShitpostBR": 4,
-        "circojeca": 5,
-    }
-    assert config.horarios == tuple(time(h) for h in (0, 1, 2, *range(9, 24)))  # de hora em hora, 9h às 2h
+    assert config.fontes and config.horarios
+    assert all(fonte.nivel is None or 1 <= fonte.nivel <= 5 for fonte in config.fontes)
+    assert len({fonte.subreddit.lower() for fonte in config.fontes}) == len(config.fontes)  # sem repetidas
+    assert len(set(config.reacoes.em_ordem())) == 4
+    assert 1 <= config.regua_inicial <= 5
+    assert config.estoque_pasta.name == "estoque"
+    assert (config.historico.name, config.termometro.name, config.painel.name) == (
+        "historico.json",
+        "termometro.json",
+        "painel.json",
+    )
+
+
+def test_horarios_do_repositorio_entre_aspas_e_sem_aspas_dao_no_mesmo(tmp_path):
+    caminho = tmp_path / "config.yml"
+    caminho.write_text(
+        'fontes: [memes]\nagenda:\n  horarios: [\n      "09:00", 10:00,\n      "00:00", "02:00"\n    ]\n',
+        encoding="utf-8",
+    )
+    config = carregar_config(caminho)
+    assert config.horarios == (time(0), time(2), time(9), time(10))
     assert config.tolerancia == timedelta(hours=2)
     assert (config.ranking_dia, config.ranking_horario) == (6, time(21))
-    assert config.reacoes.em_ordem() == ("😂", "😐", "🌶️", "🚫")
-    assert config.regua_inicial == 4
-    assert config.permitir_nsfw is True
-    assert config.votos_para_remover == 3
-    assert config.estoque_pasta.name == "estoque"
-    assert config.historico.name == "historico.json"
-    assert config.termometro.name == "termometro.json"
 
 
 def test_fontes_aceitam_texto_simples_e_prefixo_r(tmp_path):
     caminho = tmp_path / "config.yml"
     caminho.write_text("fontes:\n  - r/memes\n  - subreddit: eu_nvr\n    peso: 2\n    nivel: 4\n", encoding="utf-8")
     config = carregar_config(caminho)
-    assert [(f.subreddit, f.nivel, f.peso) for f in config.fontes] == [("memes", 3.0, 1.0), ("eu_nvr", 4.0, 2.0)]
+    assert [(f.subreddit, f.nivel, f.peso) for f in config.fontes] == [("memes", None, 1.0), ("eu_nvr", 4.0, 2.0)]
+    assert not config.fontes[0].segue_a_regua  # sem nível: fora da régua
+    assert config.fontes[1].segue_a_regua
     assert config.estoque_chance == 0.2  # valores padrão
     assert config.surpresa == 0.2
     assert config.reacoes.mais_pesado == "🌶️"

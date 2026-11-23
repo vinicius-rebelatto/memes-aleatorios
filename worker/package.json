@@ -1,0 +1,9 @@
+{
+  "name": "memes-aleatorios-comandos",
+  "private": true,
+  "type": "module",
+  "description": "Comandos /meme, /termometro e /ajuda do bot de memes (Cloudflare Workers)",
+  "scripts": {
+    "test": "node --test"
+  }
+}

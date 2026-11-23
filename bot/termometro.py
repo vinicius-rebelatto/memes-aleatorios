@@ -148,11 +148,28 @@ class Termometro:
 
     # ---- leitura -----------------------------------------------------------------
 
+    def peso_surpresa(self, fonte: Fonte) -> float:
+        """Chance relativa num post surpresa: ignora a régua, mas não os 😂 e 😐 da galera."""
+        return fonte.peso * multiplicador(self.afinidade.get(fonte.subreddit, 0.0))
+
     def peso_da_fonte(self, fonte: Fonte) -> float:
-        """Chance relativa de a fonte ser sorteada: peso × perto da régua × afinidade."""
-        return (
-            fonte.peso * proximidade(fonte.nivel, self.regua) * multiplicador(self.afinidade.get(fonte.subreddit, 0.0))
-        )
+        """Chance relativa num post normal: peso × perto da régua × afinidade.
+
+        Fonte sem nível (ex.: memes de jogo) fica fora da régua: sai sempre na mesma proporção.
+        """
+        perto = proximidade(fonte.nivel, self.regua) if fonte.segue_a_regua else 1.0
+        return perto * self.peso_surpresa(fonte)
+
+    def chances(self, fontes: tuple[Fonte, ...], surpresa: float) -> dict[str, float]:
+        """Probabilidade de cada fonte ser a primeira tentativa do próximo meme (somando 1)."""
+
+        def normalizar(pesos: dict[str, float]) -> dict[str, float]:
+            total = sum(pesos.values())
+            return {nome: (peso / total if total else 1 / len(pesos)) for nome, peso in pesos.items()}
+
+        normal = normalizar({fonte.subreddit: self.peso_da_fonte(fonte) for fonte in fontes})
+        sorteio = normalizar({fonte.subreddit: self.peso_surpresa(fonte) for fonte in fontes})
+        return {nome: (1 - surpresa) * normal[nome] + surpresa * sorteio[nome] for nome in normal}
 
     def variacao_desde(self, momento: datetime) -> float:
         """Quanto a régua andou desde `momento` (positivo = ficou mais pesada)."""
@@ -174,8 +191,15 @@ class Termometro:
     def descrever_regua(self) -> str:
         return f"{numero_br(self.regua)}/5 {barra(self.regua)}"
 
-    def fontes_em_destaque(self, quantidade: int = 2) -> tuple[list[tuple[str, float]], list[tuple[str, float]]]:
-        """(em alta, em baixa): fontes com maior e menor afinidade, ignorando as neutras."""
-        positivas = sorted(((s, a) for s, a in self.afinidade.items() if a > 0), key=lambda x: -x[1])
-        negativas = sorted(((s, a) for s, a in self.afinidade.items() if a < 0), key=lambda x: x[1])
+    def fontes_em_destaque(
+        self, quantidade: int = 2, fontes: tuple[Fonte, ...] | None = None
+    ) -> tuple[list[tuple[str, float]], list[tuple[str, float]]]:
+        """(em alta, em baixa): fontes com maior e menor afinidade, ignorando as neutras.
+
+        Com `fontes`, só entram as que ainda estão no config.yml.
+        """
+        ativas = None if fontes is None else {fonte.subreddit for fonte in fontes}
+        notas = [(s, a) for s, a in self.afinidade.items() if ativas is None or s in ativas]
+        positivas = sorted(((s, a) for s, a in notas if a > 0), key=lambda x: -x[1])
+        negativas = sorted(((s, a) for s, a in notas if a < 0), key=lambda x: x[1])
         return positivas[:quantidade], negativas[:quantidade]
