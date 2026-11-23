@@ -35,6 +35,7 @@ from .fontes import (
     baixar_imagem,
     buscar_memes,
     candidatos_da_fonte,
+    enviados_pelo_comando,
     escolher_meme,
     pontuar,
 )
@@ -106,9 +107,15 @@ def postar_meme(
     baixar=None,
 ) -> dict:
     """Escolhe um meme novo, posta só a imagem com as 4 reações e registra no histórico."""
-    escolher = escolher or (
-        lambda: escolher_meme(config, historico.ja_postado, log=log, termometro=termometro, permitir_nsfw=permitir_nsfw)
-    )
+    if escolher is None:
+        do_comando = enviados_pelo_comando(config.worker)
+
+        def ja_saiu(meme: Meme) -> bool:
+            return historico.ja_postado(meme) or meme.link in do_comando or meme.imagem in do_comando
+
+        def escolher():
+            return escolher_meme(config, ja_saiu, log=log, termometro=termometro, permitir_nsfw=permitir_nsfw)
+
     meme = escolher()
     if meme is None:
         raise SemMemeNovo(

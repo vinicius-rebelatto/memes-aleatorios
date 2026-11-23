@@ -76,10 +76,15 @@ function comando(nome, opcoes = [], extra = {}) {
   return { type: TIPO.COMANDO, application_id: "123", token: "tok", data: { name: nome, options: opcoes }, ...extra };
 }
 
-async function rodar(interacao, internet) {
+function kvFalso() {
+  const dados = new Map();
+  return { dados, get: async (chave) => dados.get(chave) ?? null, put: async (chave, valor) => void dados.set(chave, valor) };
+}
+
+async function rodar(interacao, internet, env = { PAINEL_URL }) {
   globalThis.fetch = internet.fetchFalso;
   const ctx = contexto();
-  const resposta = await responder(interacao, { PAINEL_URL }, ctx);
+  const resposta = await responder(interacao, env, ctx);
   await Promise.all(ctx.tarefas);
   return { resposta: await resposta.json(), discord: internet.chamadas.filter((c) => c.url.includes("discord.com")) };
 }
@@ -248,6 +253,33 @@ describe("escolha do meme", () => {
     const memes = { circojeca: [memeDaApi("1y00002", { url: "https://v.redd.it/video" }), memeDaApi("1t00000")] };
     const { discord } = await rodar(comando("meme", [{ name: "subreddit", value: "circojeca" }]), internetFalsa({ memes }));
     assert.equal(discord[0].metodo, "PATCH");
+  });
+
+  it("não repete meme: lembra o que já mandou e avisa quando acabou", async () => {
+    const env = { PAINEL_URL, JA_ENVIADOS: kvFalso() };
+    const memes = { circojeca: [memeDaApi("1y00002"), memeDaApi("1y00003")] };
+    const pedido = [{ name: "subreddit", value: "circojeca" }];
+    const enviados = [];
+    for (let vez = 0; vez < 2; vez++) {
+      const { discord } = await rodar(comando("meme", pedido), internetFalsa({ memes }), env);
+      assert.equal(discord[0].metodo, "PATCH");
+      enviados.push(JSON.parse(env.JA_ENVIADOS.dados.get("enviados")).at(-1).link);
+    }
+    assert.deepEqual(enviados.sort(), ["https://redd.it/1y00002", "https://redd.it/1y00003"]);
+    const { discord } = await rodar(comando("meme", pedido), internetFalsa({ memes }), env);
+    assert.match(JSON.parse(discord[1].opcoes.body).content, /Já mandei todos os memes que achei em r\/circojeca/);
+  });
+
+  it("GET /enviados mostra o que o /meme já mandou", async () => {
+    const kv = kvFalso();
+    kv.dados.set("enviados", JSON.stringify([{ link: "https://redd.it/a", url: "https://i.redd.it/a.png", quando: Date.now() }]));
+    const resposta = await worker.fetch(new Request("https://w.exemplo/enviados"), { JA_ENVIADOS: kv }, contexto());
+    assert.deepEqual(await resposta.json(), { links: ["https://redd.it/a", "https://i.redd.it/a.png"] });
+  });
+
+  it("mesma imagem em outro post também conta como repetida", () => {
+    const memes = [memeDaApi("1y00002", { url: "https://i.redd.it/igual.png" })];
+    assert.equal(escolherMeme(memes, { recentes: new Set(["https://i.redd.it/igual.png"]) }), null);
   });
 
   it("ajudantes", () => {

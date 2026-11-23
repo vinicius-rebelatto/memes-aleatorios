@@ -113,6 +113,19 @@ def buscar_memes(subreddit: str, sessao=None, quantidade: int = QUANTIDADE_POR_B
     return memes
 
 
+def enviados_pelo_comando(endereco: str | None, sessao=None) -> set[str]:
+    """Links que o /meme já mandou (o Worker guarda). Se o Worker não responder, segue sem eles."""
+    if not endereco:
+        return set()
+    try:
+        resposta = (sessao or requests).get(f"{endereco}/enviados", timeout=10)
+        if resposta.status_code != 200:
+            return set()
+        return {str(link) for link in resposta.json().get("links", []) if link}
+    except (requests.RequestException, ValueError, AttributeError):
+        return set()
+
+
 def baixar_imagem(url: str, sessao=None, limite: int = LIMITE_DE_UPLOAD) -> bytes | None:
     """Baixa a imagem do meme para postar como arquivo. None se falhar ou passar do limite do Discord."""
     sessao = sessao or requests

@@ -11,6 +11,7 @@ from bot.fontes import (
     ErroDeFonte,
     baixar_imagem,
     buscar_memes,
+    enviados_pelo_comando,
     escolher_do_estoque,
     escolher_do_reddit,
     escolher_meme,
@@ -284,3 +285,13 @@ def test_com_chance_o_estoque_vem_primeiro(config):
 def test_sem_estoque_e_sem_reddit_nao_ha_meme(config):
     sessao = SessaoPorSubreddit({"eu_nvr": requests.Timeout(), "me_irl": requests.Timeout()})
     assert escolher_meme(config, nunca_postado, RngFixo(0.5), sessao, log=calado) is None
+
+
+def test_enviados_pelo_comando_le_o_worker_e_aguenta_falha():
+    resposta = RespostaFalsa(200)
+    resposta.json = lambda: {"links": ["https://redd.it/a", "https://i.redd.it/a.png"]}
+    sessao = SessaoDeImagem(resposta)
+    assert enviados_pelo_comando("https://w.exemplo", sessao) == {"https://redd.it/a", "https://i.redd.it/a.png"}
+    assert sessao.urls == ["https://w.exemplo/enviados"]
+    assert enviados_pelo_comando(None) == set()
+    assert enviados_pelo_comando("https://w.exemplo", SessaoDeImagem(requests.ConnectionError("x"))) == set()

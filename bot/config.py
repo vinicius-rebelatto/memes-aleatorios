@@ -69,6 +69,7 @@ class Config:
     ranking_incluir_galera: bool = True
     estoque_pasta: Path = RAIZ / "estoque"
     estoque_chance: float = 0.2
+    worker: str | None = None  # endereço do Worker dos comandos (para não repetir o que o /meme mandou)
     historico: Path = RAIZ / "dados" / "historico.json"
     termometro: Path = RAIZ / "dados" / "termometro.json"
     painel: Path = RAIZ / "dados" / "painel.json"
@@ -219,6 +220,7 @@ def carregar_config(caminho: Path | str = CONFIG_PADRAO) -> Config:
         ranking_incluir_galera=bool(ranking.get("incluir_posts_da_galera", True)),
         estoque_pasta=pasta,
         estoque_chance=_fracao(estoque.get("chance", 0.2), "estoque.chance"),
+        worker=(str(dados.get("worker") or "").strip().rstrip("/") or None),
         historico=caminho.parent / "dados" / "historico.json",
         termometro=caminho.parent / "dados" / "termometro.json",
         painel=caminho.parent / "dados" / "painel.json",

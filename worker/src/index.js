@@ -24,6 +24,9 @@ const IDADE_MAXIMA_ESCOLHIDO_DIAS = 365; // subreddit escolhido de propósito: a
 const FONTES_POR_TENTATIVA = 3;
 const EFEMERA = 64; // mensagem que só quem usou o comando vê
 const SEM_MENCOES = { parse: [] };
+const CHAVE_DA_MEMORIA = "enviados"; // no KV JA_ENVIADOS: o que o /meme já mandou
+const DIAS_DE_MEMORIA = 30;
+const LIMITE_DA_MEMORIA = 2000;
 const FONTES_DE_RESERVA = ["eu_nvr", "circojeca", "MemesBR", "dankmemes", "HolUp"]; // se o painel falhar
 const REACOES_PADRAO = { engracado: "😂", sem_graca: "😐", mais_pesado: "🌶️", passou_do_ponto: "🚫" };
 
@@ -86,6 +89,11 @@ export async function assinaturaValida(request, corpo, chavePublica) {
 
 export default {
   async fetch(request, env, ctx) {
+    if (request.method === "GET" && new URL(request.url).pathname === "/enviados") {
+      // Para o bot das horas não repetir o que o /meme já mandou (só links públicos do Reddit).
+      const memoria = await lerMemoria(env);
+      return json({ links: memoria.flatMap((item) => [item.link, item.url]).filter(Boolean) });
+    }
     if (request.method !== "POST") {
       return new Response("🤖 Bot de memes: os comandos do Discord chegam aqui.", {
         headers: { "content-type": "text/plain; charset=utf-8" },
@@ -303,7 +311,7 @@ export function escolherMeme(
   const maisNovo = ids.length ? Math.max(...ids) : null;
   const candidatos = [];
   for (const meme of memes) {
-    if (meme.spoiler || !ehImagem(meme.url) || recentes.has(meme.postLink)) continue;
+    if (meme.spoiler || !ehImagem(meme.url) || recentes.has(meme.postLink) || recentes.has(meme.url)) continue;
     if (meme.nsfw && !permitirNsfw) continue;
     const id = idDoPost(meme.postLink);
     const idade = id !== null && maisNovo !== null ? (maisNovo - id) / IDS_POR_DIA : null;
@@ -320,10 +328,34 @@ export function escolherMeme(
   return candidatos[candidatos.length - 1].meme;
 }
 
+// ---- memória do /meme (KV), para não repetir --------------------------------------------
+
+export async function lerMemoria(env) {
+  if (!env.JA_ENVIADOS) return [];
+  try {
+    const lista = JSON.parse((await env.JA_ENVIADOS.get(CHAVE_DA_MEMORIA)) || "[]");
+    const limite = Date.now() - DIAS_DE_MEMORIA * 86_400_000;
+    return Array.isArray(lista) ? lista.filter((item) => item.quando >= limite) : [];
+  } catch (erro) {
+    console.warn("não li a memória:", erro.message);
+    return [];
+  }
+}
+
+async function lembrar(env, memoria, meme) {
+  if (!env.JA_ENVIADOS) return;
+  const nova = [...memoria, { link: meme.postLink, url: meme.url, quando: Date.now() }].slice(-LIMITE_DA_MEMORIA);
+  try {
+    await env.JA_ENVIADOS.put(CHAVE_DA_MEMORIA, JSON.stringify(nova));
+  } catch (erro) {
+    console.warn("não gravei a memória:", erro.message);
+  }
+}
+
 async function mandarMeme(interacao, env) {
   const pedido = String(opcao(interacao, "subreddit") ?? "").trim();
-  const painel = await lerPainelOuNada(env);
-  const recentes = new Set(painel?.recentes ?? []);
+  const [painel, memoria] = await Promise.all([lerPainelOuNada(env), lerMemoria(env)]);
+  const recentes = new Set([...(painel?.recentes ?? []), ...memoria.flatMap((item) => [item.link, item.url])]);
   const canalMais18 = interacao.channel?.nsfw === true;
 
   let fontes;
@@ -353,8 +385,12 @@ async function mandarMeme(interacao, env) {
     const permitirNsfw = canalMais18 && !fonte.livre;
     const idadeMaxima = pedido ? IDADE_MAXIMA_ESCOLHIDO_DIAS : IDADE_MAXIMA_DIAS;
     const meme = escolherMeme(memes, { recentes, permitirNsfw, idadeMaxima });
-    if (meme) return enviarImagem(interacao, meme);
-    problemas.push({ fonte, erro: null });
+    if (meme) {
+      await lembrar(env, memoria, meme);
+      return enviarImagem(interacao, meme);
+    }
+    const esgotado = escolherMeme(memes, { permitirNsfw, idadeMaxima }) !== null; // tinha meme, mas já saiu
+    problemas.push({ fonte, erro: null, esgotado });
   }
 
   console.warn("sem meme:", problemas.map(({ fonte, erro }) => `r/${fonte.subreddit}: ${erro?.message ?? "nada novo"}`));
@@ -362,6 +398,12 @@ async function mandarMeme(interacao, env) {
   const erro = problemas[0]?.erro;
   if (erro && [403, 404].includes(erro.status)) {
     return avisarProblema(interacao, `🤔 O r/${fontes[0].subreddit} não existe ou está fechado.`);
+  }
+  if (problemas[0]?.esgotado) {
+    return avisarProblema(
+      interacao,
+      `🔁 Já mandei todos os memes que achei em r/${fontes[0].subreddit}. Tenta outro subreddit ou volta mais tarde.`,
+    );
   }
   const regra = canalMais18 && !fontes[0].livre ? "só vale imagem" : "só vale imagem e nada NSFW";
   return avisarProblema(interacao, `😕 Não achei meme novo em r/${fontes[0].subreddit} agora (${regra}). Tenta outro subreddit.`);

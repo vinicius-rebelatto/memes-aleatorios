@@ -13,6 +13,11 @@ PAINEL_URL = "https://raw.githubusercontent.com/vinicius-rebelatto/memes-aleator
 REPOSITORIO = "vinicius-rebelatto/memes-aleatorios"
 # O token do relógio (RELOGIO_GITHUB_TOKEN) é secret: o workflow guarda ele no Worker.
 
+# Memória do /meme: o que ele já mandou (para não repetir), guardada por 30 dias.
+[[kv_namespaces]]
+binding = "JA_ENVIADOS"
+id = "c92dc01eaf814a9fb48df69ff1329098"
+
 # O relógio: no minuto 0 de cada hora o Worker acorda o bot no GitHub Actions.
 [triggers]
 crons = ["0 * * * *"]

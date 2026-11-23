@@ -87,3 +87,6 @@ estoque:
   # Chance de o post sair do estoque (0.2 = 20%), se tiver meme novo lá.
   # Se o Reddit falhar, o estoque vira o plano B automaticamente.
   chance: 0.2
+
+# Endereço do Worker dos comandos: o bot consulta o que o /meme já mandou para não repetir.
+worker: https://memes-aleatorios.vinicius-rebelatto.workers.dev
