@@ -2,7 +2,7 @@
   "regua": 5.0,
   "afinidade": {
     "HUEstation": -1.0,
-    "HolUp": 0.75,
+    "HolUp": 1.0,
     "MinecraftMemes": 0.5,
     "ShitpostBR": -1.0,
     "circojeca": 0.5,
@@ -113,6 +113,12 @@
     },
     "1574431411434295447": {
       "engracado": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1574524307734794391": {
+      "engracado": 1,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0

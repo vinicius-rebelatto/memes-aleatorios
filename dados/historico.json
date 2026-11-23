@@ -185,6 +185,18 @@
       "nivel": 5.0,
       "nsfw": true,
       "postado_em": "2026-11-23T17:37:26-03:00"
+    },
+    {
+      "id_mensagem": "1574530155869900871",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1y3drnk",
+      "subreddit": "HolUp",
+      "titulo": "Ummmm...",
+      "link": "https://redd.it/1y3drnk",
+      "imagem": "https://i.redd.it/2uk503h3xb3i1.png",
+      "votos_reddit": 87,
+      "nivel": 5.0,
+      "postado_em": "2026-11-23T18:00:40-03:00"
     }
   ],
   "rankings": [
