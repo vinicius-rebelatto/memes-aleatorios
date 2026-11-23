@@ -2,6 +2,7 @@
   "regua": 5.0,
   "afinidade": {
     "HUEstation": -1.0,
+    "ShitpostBR": -0.5,
     "circojeca": 0.25,
     "eu_nvr": 0.5,
     "me_irl": 0.25
@@ -70,6 +71,12 @@
       "engracado": 3,
       "sem_graca": 0,
       "mais_pesado": 2,
+      "passou_do_ponto": 0
+    },
+    "1574218690851774629": {
+      "engracado": 0,
+      "sem_graca": 2,
+      "mais_pesado": 1,
       "passou_do_ponto": 0
     }
   }
