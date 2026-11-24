@@ -257,6 +257,17 @@
       "votos_reddit": 994,
       "nivel": 4.0,
       "postado_em": "2026-11-23T23:00:49-03:00"
+    },
+    {
+      "id_mensagem": "1574620780208324638",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1xwhhgp",
+      "subreddit": "LeagueOfMemes",
+      "titulo": "According to the League community",
+      "link": "https://redd.it/1xwhhgp",
+      "imagem": "https://i.redd.it/yxip8sjr5o1i1.png",
+      "votos_reddit": 5500,
+      "postado_em": "2026-11-24T00:00:45-03:00"
     }
   ],
   "rankings": [
