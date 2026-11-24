@@ -408,6 +408,18 @@
       "votos_reddit": 1266,
       "nivel": 4.0,
       "postado_em": "2026-11-24T18:00:53-03:00"
+    },
+    {
+      "id_mensagem": "1574907652088135681",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1y4njwc",
+      "subreddit": "HolUp",
+      "titulo": "Wait, what?",
+      "link": "https://redd.it/1y4njwc",
+      "imagem": "https://i.redd.it/4rkh60avbm3i1.png",
+      "votos_reddit": 0,
+      "nivel": 5.0,
+      "postado_em": "2026-11-24T19:00:42-03:00"
     }
   ],
   "rankings": [

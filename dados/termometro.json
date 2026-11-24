@@ -2,13 +2,13 @@
   "regua": 4.85,
   "afinidade": {
     "HUEstation": -1.0,
-    "HolUp": 1.5,
-    "LeagueOfMemes": 0.25,
-    "MinecraftMemes": -0.25,
+    "HolUp": 1.75,
+    "LeagueOfMemes": 0.0,
+    "MinecraftMemes": -0.5,
     "ShitpostBR": -1.0,
     "circojeca": 0.5,
-    "dankmemes": 0.5,
-    "eu_nvr": 0.5,
+    "dankmemes": 0.25,
+    "eu_nvr": 0.75,
     "me_irl": 0.25
   },
   "evolucao": [
@@ -180,7 +180,7 @@
       "passou_do_ponto": 0
     },
     "1574605698174681219": {
-      "engracado": 0,
+      "engracado": 1,
       "curti": 0,
       "sem_graca": 0,
       "mais_pesado": 0,
@@ -215,7 +215,7 @@
       "passou_do_ponto": 0
     },
     "1574771752817528913": {
-      "engracado": 0,
+      "engracado": 1,
       "curti": 0,
       "sem_graca": 0,
       "mais_pesado": 0,
@@ -231,12 +231,12 @@
     "1574801966087803083": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1574817056795267235": {
-      "engracado": 0,
+      "engracado": 1,
       "curti": 0,
       "sem_graca": 0,
       "mais_pesado": 0,
@@ -245,7 +245,7 @@
     "1574832212803584174": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
@@ -259,7 +259,7 @@
     "1574862393211879556": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
@@ -267,6 +267,13 @@
       "engracado": 0,
       "curti": 0,
       "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1574892604573749291": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     }
