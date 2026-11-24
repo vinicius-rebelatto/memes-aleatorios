@@ -221,6 +221,17 @@
       "votos_reddit": 50,
       "nivel": 5.0,
       "postado_em": "2026-11-23T20:00:42-03:00"
+    },
+    {
+      "id_mensagem": "1574575457771327608",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1xxypds",
+      "subreddit": "LeagueOfMemes",
+      "titulo": "we got a 10 second trailer and people are fuming",
+      "link": "https://redd.it/1xxypds",
+      "imagem": "https://i.redd.it/23wpmf6i012i1.png",
+      "votos_reddit": 4186,
+      "postado_em": "2026-11-23T21:00:41-03:00"
     }
   ],
   "rankings": [
