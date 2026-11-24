@@ -106,7 +106,7 @@ def postar_meme(
     log=print,
     baixar=None,
 ) -> dict:
-    """Escolhe um meme novo, posta só a imagem com as 4 reações e registra no histórico."""
+    """Escolhe um meme novo, posta só a imagem com as reações e registra no histórico."""
     if escolher is None:
         do_comando = enviados_pelo_comando(config.worker)
 

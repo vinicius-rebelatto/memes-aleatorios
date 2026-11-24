@@ -130,3 +130,14 @@ def test_anunciar_posta_e_registra_no_historico(config, tmp_path):
     assert [c.mensagem_id for c in colocados] == ["1001", "2001", "1002"]
     assert discord.enviadas[0]["corpo"]["embeds"][0]["title"] == "🏆 Meme da Semana"
     assert historico.ultimo_ranking() == FIM.date()
+
+
+def test_curti_e_engracado_somam_no_meme_da_semana(tmp_path):
+    mensagens = [
+        {"id": "1001", "type": 0, "author": {"id": BOT}, "reactions": [reacao("😂", 2, True), reacao("👍", 3, True)]},
+        {"id": "2001", "type": 0, "author": {"id": "123"}, "reactions": [reacao("👍", 2)]},
+    ]
+    colocados = calcular_ranking(mensagens, BOT, preparar_historico(tmp_path), ("😂", "👍"))
+    assert [(c.mensagem_id, c.votos) for c in colocados] == [("1001", 3), ("2001", 2)]
+    corpo, _ = montar_anuncio([], "111", "555", ("😂", "👍"), INICIO, FIM, tmp_path)
+    assert "Reajam com 😂 ou 👍" in corpo["embeds"][0]["description"]

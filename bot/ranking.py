@@ -34,7 +34,7 @@ def calcular_ranking(
     mensagens: list[dict],
     bot_id: str,
     historico: Historico,
-    emoji: str,
+    emoji: str | tuple[str, ...],
     incluir_galera: bool = True,
     quantidade: int = 3,
 ) -> list[Colocado]:
@@ -50,7 +50,8 @@ def calcular_ranking(
                 continue  # anúncios do próprio bot não concorrem
         elif not incluir_galera or autor.get("bot"):
             continue
-        votos = contar_reacao(mensagem, emoji)
+        emojis = (emoji,) if isinstance(emoji, str) else emoji
+        votos = sum(contar_reacao(mensagem, item) for item in emojis)
         if votos > 0:
             colocados.append(Colocado(mensagem["id"], votos, str(autor.get("id", "")), registro))
     # mais votos primeiro; no empate, ganha quem postou antes
@@ -90,13 +91,14 @@ def montar_anuncio(
     colocados: list[Colocado],
     servidor_id: str,
     canal_id: str,
-    emoji: str,
+    emoji: str | tuple[str, ...],
     inicio: datetime,
     fim: datetime,
     pasta_estoque: Path,
     termometro: Termometro | None = None,
     fontes=None,
 ) -> tuple[dict, tuple | None]:
+    emoji = emoji if isinstance(emoji, str) else " ou ".join(emoji)
     if colocados:
         linhas = []
         for posicao, colocado in enumerate(colocados):
@@ -144,7 +146,7 @@ def anunciar(
     log=print,
 ) -> list[Colocado]:
     """Conta os votos dos últimos dias, posta o anúncio e registra no histórico."""
-    emoji = config.reacoes.engracado
+    emoji = config.reacoes.votos_do_ranking()
     inicio = quando - timedelta(days=config.ranking_dias)
     canal = discord.canal(canal_id)
     bot_id = discord.eu()["id"]

@@ -40,6 +40,7 @@ class Fonte:
 @dataclass(frozen=True)
 class Reacoes:
     engracado: str = "😂"
+    curti: str = "👍"
     sem_graca: str = "😐"
     mais_pesado: str = "🌶️"
     passou_do_ponto: str = "🚫"
@@ -47,6 +48,7 @@ class Reacoes:
     def como_dict(self) -> dict[str, str]:
         return {
             "engracado": self.engracado,
+            "curti": self.curti,
             "sem_graca": self.sem_graca,
             "mais_pesado": self.mais_pesado,
             "passou_do_ponto": self.passou_do_ponto,
@@ -54,6 +56,10 @@ class Reacoes:
 
     def em_ordem(self) -> tuple[str, ...]:
         return tuple(self.como_dict().values())
+
+    def votos_do_ranking(self) -> tuple[str, ...]:
+        """As reações que valem voto no Meme da Semana."""
+        return (self.engracado, self.curti)
 
 
 @dataclass(frozen=True)
@@ -168,9 +174,9 @@ def _ler_reacoes(dados: dict) -> Reacoes:
     padrao = Reacoes().como_dict()
     escolhidas = {nome: str(secao.get(nome, emoji)).strip() for nome, emoji in padrao.items()}
     if any(not emoji for emoji in escolhidas.values()):
-        raise ErroDeConfiguracao("No config.yml, nenhuma das 4 reações pode ficar vazia.")
+        raise ErroDeConfiguracao("No config.yml, nenhuma das reações pode ficar vazia.")
     if len(set(escolhidas.values())) != len(escolhidas):
-        raise ErroDeConfiguracao("No config.yml, as 4 reações precisam ser emojis diferentes.")
+        raise ErroDeConfiguracao("No config.yml, as reações precisam ser emojis diferentes.")
     return Reacoes(**escolhidas)
 
 

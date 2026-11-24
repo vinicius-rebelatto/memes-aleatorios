@@ -11,7 +11,7 @@ def test_config_do_repositorio_carrega():
     assert config.fontes and config.horarios
     assert all(fonte.nivel is None or 1 <= fonte.nivel <= 5 for fonte in config.fontes)
     assert len({fonte.subreddit.lower() for fonte in config.fontes}) == len(config.fontes)  # sem repetidas
-    assert len(set(config.reacoes.em_ordem())) == 4
+    assert len(set(config.reacoes.em_ordem())) == 5
     assert 1 <= config.regua_inicial <= 5
     assert config.estoque_pasta.name == "estoque"
     assert (config.historico.name, config.termometro.name, config.painel.name) == (

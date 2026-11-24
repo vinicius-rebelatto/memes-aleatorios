@@ -45,9 +45,10 @@ fontes:
   - subreddit: dontstarve
     peso: 0.3
 
-# As 4 reações que o bot coloca em cada meme.
+# As reações que o bot coloca em cada meme.
 reacoes:
   engracado: "😂" # vale voto no Meme da Semana e faz a fonte aparecer mais
+  curti: "👍" # gostei, mesmo sem ser de rir: vale igual ao 😂
   sem_graca: "😐" # faz a fonte aparecer menos
   mais_pesado: "🌶️" # sobe a régua
   passou_do_ponto: "🚫" # desce a régua (e com votos suficientes apaga o meme)

@@ -28,7 +28,7 @@ const CHAVE_DA_MEMORIA = "enviados"; // no KV JA_ENVIADOS: o que o /meme já man
 const DIAS_DE_MEMORIA = 30;
 const LIMITE_DA_MEMORIA = 2000;
 const FONTES_DE_RESERVA = ["eu_nvr", "circojeca", "MemesBR", "dankmemes", "HolUp"]; // se o painel falhar
-const REACOES_PADRAO = { engracado: "😂", sem_graca: "😐", mais_pesado: "🌶️", passou_do_ponto: "🚫" };
+const REACOES_PADRAO = { engracado: "😂", curti: "👍", sem_graca: "😐", mais_pesado: "🌶️", passou_do_ponto: "🚫" };
 
 export const TIPO = { PING: 1, COMANDO: 2, AUTOCOMPLETAR: 4 };
 export const RESPOSTA = { PONG: 1, MENSAGEM: 4, PENSANDO: 5, SUGESTOES: 8 };
@@ -498,6 +498,7 @@ export function textoDeAjuda(painel) {
     "",
     "**Reaja nos memes, é assim que a galera treina o bot:**",
     `${r.engracado} engraçado: vale voto no Meme da Semana e a fonte aparece mais`,
+    `${r.curti} curti: gostei, mesmo sem ser de rir (vale igual ao ${r.engracado})`,
     `${r.sem_graca} sem graça: a fonte aparece menos`,
     `${r.mais_pesado} mais pesado: sobe a régua de peso`,
     `${r.passou_do_ponto} passou do ponto: desce a régua (com ${votos} votos o meme some)`,
@@ -507,7 +508,7 @@ export function textoDeAjuda(painel) {
     "`/termometro`: a régua e as fontes favoritas da galera",
     "`/ajuda`: esta explicação",
     "",
-    `🏆 O Meme da Semana sai ${ranking}: ganha o meme com mais ${r.engracado}.`,
+    `🏆 O Meme da Semana sai ${ranking}: ganha o meme com mais ${r.engracado} e ${r.curti}.`,
   ].join("\n");
 }
 

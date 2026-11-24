@@ -90,19 +90,19 @@ def test_imagem_grande_demais_para_o_servidor_vai_como_link(config, tmp_path):
     avisos = []
     resultado, discord, _, _ = rodar(config, tmp_path, "agora", em(12), discord=DiscordSemEspaco(), log=avisos.append)
     assert discord.enviadas[0]["corpo"]["content"] == "https://i.redd.it/abc1.png"
-    assert len(discord.reacoes) == 4 and not resultado.erros
+    assert len(discord.reacoes) == 5 and not resultado.erros
     assert any("limite de upload" in aviso for aviso in avisos)
 
 
 # ---- modo agora (botão) --------------------------------------------------------------
 
 
-def test_modo_agora_posta_com_as_4_reacoes_mesmo_fora_de_hora(config, tmp_path):
+def test_modo_agora_posta_com_as_5_reacoes_mesmo_fora_de_hora(config, tmp_path):
     resultado, discord, historico, _ = rodar(config, tmp_path, "agora", em(3, 0))
     assert len(discord.enviadas) == 1
     assert discord.enviadas[0]["anexo"] == ("meme.png", b"png", "image/png")
-    assert discord.reacoes == [("5001", "😂"), ("5001", "😐"), ("5001", "🌶️"), ("5001", "🚫")]
-    assert discord.dormidas == [0.35, 0.35, 0.35]
+    assert discord.reacoes == [("5001", "😂"), ("5001", "👍"), ("5001", "😐"), ("5001", "🌶️"), ("5001", "🚫")]
+    assert discord.dormidas == [0.35] * 4
     assert resultado.meme["id_mensagem"] == "5001"
     assert resultado.meme["postado_em"] == "2026-11-22T03:00:00-03:00"
     assert resultado.mudou_algo and not resultado.erros
@@ -242,7 +242,7 @@ def test_problema_ao_ler_ou_reagir_nao_impede_o_post(config, tmp_path):
     )
     assert len(discord.enviadas) == 1 and resultado.meme is not None
     assert any("ler as reações" in aviso for aviso in avisos)
-    assert sum("reagir" in aviso for aviso in avisos) == 4
+    assert sum("reagir" in aviso for aviso in avisos) == 5
 
 
 # ---- linha de comando ------------------------------------------------------------------

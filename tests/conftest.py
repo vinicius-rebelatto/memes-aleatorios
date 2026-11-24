@@ -174,10 +174,11 @@ def reacao(emoji, quantidade, do_bot=False):
     return {"emoji": {"id": None, "name": emoji}, "count": quantidade, "me": do_bot}
 
 
-def reacoes_do_bot(engracado=0, sem_graca=0, mais_pesado=0, passou_do_ponto=0):
-    """As 4 reações de um meme do bot: o número é de PESSOAS (o bot também reagiu)."""
+def reacoes_do_bot(engracado=0, sem_graca=0, mais_pesado=0, passou_do_ponto=0, curti=0):
+    """As reações de um meme do bot: o número é de PESSOAS (o bot também reagiu)."""
     return [
         reacao("😂", engracado + 1, do_bot=True),
+        reacao("👍", curti + 1, do_bot=True),
         reacao("😐", sem_graca + 1, do_bot=True),
         reacao("🌶️", mais_pesado + 1, do_bot=True),
         reacao("🚫", passou_do_ponto + 1, do_bot=True),

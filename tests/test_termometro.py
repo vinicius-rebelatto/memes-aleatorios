@@ -149,3 +149,11 @@ def test_salvar_e_carregar(tmp_path):
     de_novo = Termometro.carregar(caminho, regua_inicial=4.0)  # o arquivo manda, não o padrão
     assert de_novo.regua == 2.0
     assert de_novo.afinidade == {"eu_nvr": 0.75}
+
+
+def test_curti_conta_como_voto_positivo_para_a_fonte(tmp_path):
+    termometro = Termometro(tmp_path / "t.json")
+    registro = {"fonte": "reddit", "subreddit": "eu_nvr"}
+    termometro.contar_votos({"id": "1", "reactions": reacoes_do_bot(curti=2, sem_graca=1)}, registro, REACOES)
+    assert termometro.afinidade["eu_nvr"] == pytest.approx(0.25)  # 2 👍 - 1 😐
+    assert termometro.regua == 3.0  # 👍 não mexe na régua

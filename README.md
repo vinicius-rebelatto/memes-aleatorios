@@ -8,11 +8,12 @@ não tem servidor, nem nada ligado o tempo todo.
 ## Como funciona
 
 **18 memes por dia, de hora em hora, das 9h às 2h da manhã** (horário de Brasília). O meme chega **só a imagem**,
-sem moldura, título ou texto, com 4 reações:
+sem moldura, título ou texto, com 5 reações:
 
 | Reação | Significa         | O que muda                                                     |
 | ------ | ----------------- | -------------------------------------------------------------- |
 | 😂     | achei engraçado   | memes daquela fonte aparecem mais (e vale voto no Meme da Semana) |
+| 👍     | curti             | igual ao 😂, para meme bom que não é de rir (criativo, inteligente) |
 | 😐     | sem graça         | memes daquela fonte aparecem menos                             |
 | 🌶️     | quero mais pesado | a régua sobe                                                   |
 | 🚫     | passou do ponto   | a régua desce, e com **3 pessoas** marcando o bot apaga o meme |
@@ -26,7 +27,7 @@ sem moldura, título ou texto, com 4 reações:
 - De vez em quando (20%) ele posta do [estoque da galera](#-estoque-da-galera).
 
 > 💡 Sugestão de tópico para o canal (Editar canal → Tópico): *Meme de hora em hora 🤖 Reaja: 😂 engraçado ·
-> 😐 sem graça · 🌶️ mais pesado · 🚫 passou do ponto (3 🚫 apagam). /meme pede um na hora, /termometro mostra a régua.*
+> 👍 curti · 😐 sem graça · 🌶️ mais pesado · 🚫 passou do ponto (3 🚫 apagam). /meme pede um na hora, /termometro mostra a régua.*
 
 ### 💬 Comandos
 
@@ -53,7 +54,7 @@ Cada fonte de memes (um subreddit) tem um **nível de peso**, de 1 (leve) a 5 (p
 | 🎮 fora da régua | r/leagueofmemes, r/MinecraftMemes, r/dontstarve (jogos)    |
 
 - A **régua** sobe um pouco a cada 🌶️ e desce a cada 🚫.
-- Na hora de escolher, o bot prefere as fontes com nível **perto da régua** e com mais 😂 do que 😐.
+- Na hora de escolher, o bot prefere as fontes com nível **perto da régua** e com mais 😂 e 👍 do que 😐.
 - As fontes de **jogos ficam fora da régua**: saem sempre na mesma proporção (cerca de 1 em cada 4 memes),
   mas os 😂 e 😐 também valem para elas.
 - Dentro da fonte, ele pega o meme **mais votado entre os recentes**: post velho não ganha de post do momento.
@@ -194,7 +195,7 @@ Crie o token do item e, uma conta grátis no [cron-job.org](https://cron-job.org
 | Horários dos memes                          | `config.yml` → `agenda.horarios`                      |
 | Dia e hora do Meme da Semana                | `config.yml` → `ranking.dia` e `ranking.horario`      |
 | Fontes, o nível de cada uma e o peso        | `config.yml` → `fontes` (sem `nivel` = fora da régua) |
-| Os emojis das 4 reações                     | `config.yml` → `reacoes`                              |
+| Os emojis das reações                       | `config.yml` → `reacoes`                              |
 | Onde a régua começa e a chance de surpresa  | `config.yml` → `termometro`                           |
 | Liberar ou bloquear NSFW                    | `config.yml` → `nsfw.permitir`                        |
 | Quantos 🚫 apagam um meme                   | `config.yml` → `moderacao.votos_para_remover`         |
@@ -264,7 +265,7 @@ cd worker && node --test              # testes dos comandos (precisa do Node 22 
 | `bot/termometro.py`    | O algoritmo da galera: régua de peso e afinidade de cada fonte               |
 | `bot/fontes.py`        | Busca memes na [meme-api](https://github.com/D3vd/Meme_Api) e no estoque e escolhe o melhor |
 | `bot/moderar.py`       | Apaga os memes do bot que levaram 🚫 suficientes                             |
-| `bot/ranking.py`       | Conta os 😂 da semana e monta o anúncio com o termômetro                     |
+| `bot/ranking.py`       | Conta os 😂 e 👍 da semana e monta o anúncio com o termômetro                     |
 | `bot/painel.py`        | Grava `dados/painel.json`, o resumo do termômetro que os comandos leem       |
 | `bot/historico.py`     | Lê e grava `dados/historico.json`                                            |
 | `bot/discord_api.py`   | Conversa com a API do Discord                                                |

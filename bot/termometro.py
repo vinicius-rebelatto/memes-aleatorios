@@ -1,6 +1,7 @@
 """O termômetro da galera: a régua de peso e a afinidade de cada fonte.
 
-- Cada meme do bot chega com 4 reações: 😂 engraçado, 😐 sem graça, 🌶️ mais pesado e 🚫 passou do ponto.
+- Cada meme do bot chega com 5 reações: 😂 engraçado, 👍 curti, 😐 sem graça, 🌶️ mais pesado e
+  🚫 passou do ponto.
 - 🌶️ sobe a régua e 🚫 desce. A régua vai de 1 (leve) a 5 (pesado).
 - 😂 e 😐 dão nota para a fonte do meme (a "afinidade"): fonte que leva 😂 aparece mais.
 - Na hora de escolher o próximo meme, o bot prefere fontes com nível perto da régua e
@@ -115,7 +116,7 @@ class Termometro:
         if registro.get("fonte") == "reddit" and registro.get("subreddit"):
             subreddit = registro["subreddit"]
             nota = self.afinidade.get(subreddit, 0.0) + PASSO_DA_AFINIDADE * (
-                diferenca["engracado"] - diferenca["sem_graca"]
+                diferenca["engracado"] + diferenca["curti"] - diferenca["sem_graca"]
             )
             self.afinidade[subreddit] = round(_limitar(nota, -AFINIDADE_MAXIMA, AFINIDADE_MAXIMA), 3)
 
