@@ -432,6 +432,18 @@
       "votos_reddit": 0,
       "nivel": 5.0,
       "postado_em": "2026-11-24T20:00:44-03:00"
+    },
+    {
+      "id_mensagem": "1574937851550892156",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1y4ft6r",
+      "subreddit": "eu_nvr",
+      "titulo": "Eu_nvr",
+      "link": "https://redd.it/1y4ft6r",
+      "imagem": "https://i.redd.it/pdytiu7iuk3i1.png",
+      "votos_reddit": 343,
+      "nivel": 4.0,
+      "postado_em": "2026-11-24T21:00:42-03:00"
     }
   ],
   "rankings": [

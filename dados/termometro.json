@@ -1,8 +1,8 @@
 {
-  "regua": 5.0,
+  "regua": 4.85,
   "afinidade": {
     "HUEstation": -1.0,
-    "HolUp": 2.25,
+    "HolUp": 2.5,
     "LeagueOfMemes": 0.0,
     "MinecraftMemes": -0.5,
     "ShitpostBR": -1.0,
@@ -40,6 +40,10 @@
     {
       "quando": "2026-11-24T20:00:44-03:00",
       "regua": 5.0
+    },
+    {
+      "quando": "2026-11-24T21:00:42-03:00",
+      "regua": 4.85
     }
   ],
   "votos_contados": {
@@ -287,6 +291,13 @@
       "sem_graca": 0,
       "mais_pesado": 1,
       "passou_do_ponto": 0
+    },
+    "1574922762823278642": {
+      "engracado": 1,
+      "curti": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 1
     }
   }
 }
