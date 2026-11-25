@@ -527,6 +527,17 @@
       "votos_reddit": 15,
       "nivel": 5.0,
       "postado_em": "2026-11-25T10:00:43-03:00"
+    },
+    {
+      "id_mensagem": "1575149251246166087",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1y3nawh",
+      "subreddit": "LeagueOfMemes",
+      "titulo": "Here's my idea for a new champion",
+      "link": "https://redd.it/1y3nawh",
+      "imagem": "https://i.redd.it/khj2i80b6e3i1.png",
+      "votos_reddit": 1096,
+      "postado_em": "2026-11-25T11:00:43-03:00"
     }
   ],
   "rankings": [
