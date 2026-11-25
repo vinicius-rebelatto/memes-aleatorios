@@ -4,10 +4,10 @@
     "HUEstation": -1.0,
     "HolUp": 2.25,
     "LeagueOfMemes": -0.5,
-    "MinecraftMemes": -0.5,
+    "MinecraftMemes": -0.75,
     "ShitpostBR": -1.0,
     "circojeca": 0.5,
-    "dankmemes": 0.0,
+    "dankmemes": -0.25,
     "dontstarve": -0.5,
     "eu_nvr": 0.25,
     "me_irl": 0.25
@@ -377,7 +377,14 @@
     "1575194556004048979": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575209657629417574": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     }
