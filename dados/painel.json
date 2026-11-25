@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-11-25T11:00:43-03:00",
+  "atualizado_em": "2026-11-25T12:00:44-03:00",
   "regua": 5.0,
   "regua_texto": "5,0/5 🟩🟩🟨🟧🟥",
   "regua_na_semana": "🌶️ subiu 2,0",
@@ -17,67 +17,67 @@
     {
       "subreddit": "HolUp",
       "nivel": 5.0,
-      "chance": 0.4842,
-      "afinidade": 2.75
+      "chance": 0.4398,
+      "afinidade": 2.25
     },
     {
       "subreddit": "circojeca",
       "nivel": 5.0,
-      "chance": 0.1572,
+      "chance": 0.1833,
       "afinidade": 0.5
     },
     {
       "subreddit": "eu_nvr",
       "nivel": 4.0,
-      "chance": 0.0952,
-      "afinidade": 0.75
+      "chance": 0.0861,
+      "afinidade": 0.25
     },
     {
       "subreddit": "dankmemes",
       "nivel": 4.0,
-      "chance": 0.0741,
-      "afinidade": 0.25
+      "chance": 0.076,
+      "afinidade": 0.0
     },
     {
       "subreddit": "leagueofmemes",
       "nivel": null,
-      "chance": 0.0612,
+      "chance": 0.0714,
       "afinidade": 0.0
     },
     {
       "subreddit": "MinecraftMemes",
       "nivel": null,
-      "chance": 0.0477,
+      "chance": 0.0556,
       "afinidade": -0.5
     },
     {
       "subreddit": "dontstarve",
       "nivel": null,
-      "chance": 0.0324,
-      "afinidade": -0.25
+      "chance": 0.0334,
+      "afinidade": -0.5
     },
     {
       "subreddit": "DiretoDoZapZap",
       "nivel": 2.0,
-      "chance": 0.0174,
+      "chance": 0.0197,
       "afinidade": 0.0
     },
     {
       "subreddit": "MemesBR",
       "nivel": 2.0,
-      "chance": 0.0174,
+      "chance": 0.0197,
       "afinidade": 0.0
     },
     {
       "subreddit": "HUEstation",
       "nivel": 3.0,
-      "chance": 0.0133,
+      "chance": 0.0151,
       "afinidade": -1.0
     }
   ],
   "em_alta": [
     "HolUp",
-    "eu_nvr"
+    "circojeca"
   ],
   "em_baixa": [
     "HUEstation",
@@ -124,6 +124,7 @@
     "https://redd.it/1y3ivv5",
     "https://redd.it/1y4y7mk",
     "https://redd.it/1y52xzc",
-    "https://redd.it/1y3nawh"
+    "https://redd.it/1y3nawh",
+    "https://redd.it/1y4lu47"
   ]
 }
