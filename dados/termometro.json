@@ -1,8 +1,8 @@
 {
-  "regua": 4.85,
+  "regua": 5.0,
   "afinidade": {
     "HUEstation": -1.0,
-    "HolUp": 2.5,
+    "HolUp": 2.75,
     "LeagueOfMemes": 0.0,
     "MinecraftMemes": -0.5,
     "ShitpostBR": -1.0,
@@ -44,6 +44,10 @@
     {
       "quando": "2026-11-24T21:00:42-03:00",
       "regua": 4.85
+    },
+    {
+      "quando": "2026-11-24T23:00:45-03:00",
+      "regua": 5.0
     }
   ],
   "votos_contados": {
@@ -293,7 +297,7 @@
       "passou_do_ponto": 0
     },
     "1574922762823278642": {
-      "engracado": 1,
+      "engracado": 2,
       "curti": 0,
       "sem_graca": 0,
       "mais_pesado": 0,
@@ -303,7 +307,14 @@
       "engracado": 0,
       "curti": 0,
       "sem_graca": 0,
-      "mais_pesado": 0,
+      "mais_pesado": 1,
+      "passou_do_ponto": 0
+    },
+    "1574952967415537765": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 0,
+      "mais_pesado": 1,
       "passou_do_ponto": 0
     }
   }
