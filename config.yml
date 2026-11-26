@@ -22,40 +22,12 @@ agenda:
 #   `peso` dá um empurrão fixo (padrão 1): 2 = o dobro de chance, 0.5 = metade.
 #   Cada subreddit pode ter seu próprio `peso` e `nivel`, como o dankmemes abaixo.
 categorias:
-  "🇧🇷 Brasileiros":
-    nivel: 4
-    peso: 1.5
-    fontes: [MemesBrasil, MemesBR, eu_nvr, circojeca, HUEstation, DiretoDoZapZap]
-
-  "💀 Humor pesado":
-    nivel: 5
-    fontes:
-      - HolUp
-      - darkmemers
-      - subreddit: dankmemes
-        nivel: 4
-      - subreddit: 2meirl4meirl
-        nivel: 4
-
-  "😂 Gerais":
-    nivel: 2
-    fontes: [memes, me_irl, BikiniBottomTwitter, funny, wholesomememes]
-
-  "🌀 Absurdos":
-    nivel: 3
-    fontes: [surrealmemes, comedyheaven, ComedyCemetery]
-
-  "👴 Memes de velho":
-    nivel: 2
-    fontes: [OldPeopleFacebook, terriblefacebookmemes, boomershumor]
-
-  "🎮 Jogos":
-    peso: 0.6
-    fontes: [LeagueOfMemes, MinecraftMemes, PhoenixSC, GameMemes, Gamingcirclejerk]
-
-  "🤓 Nerd":
-    peso: 0.4
-    fontes: [HistoryMemes, ProgrammerHumor, PrequelMemes]
+  lol:
+    fontes: [LeagueOfMemes, leagueoflegends, LeagueOfLegendsMemes, lolbr, SKTT1, ARAM, leagueoflegendsmeta, LeagueOfLegendsShitposts, Leagueofmemesbr, lolesports]
+  mine:
+    fontes: [MinecraftMemes, PhoenixSC, Minecraft, Minecraft_Memes, Minecraftshitposts, MinecraftUnlimited, technicalminecraft, Minecraft2, MinecraftHumor]
+  jogos:
+    fontes: [GameMemes, Gamingcirclejerk, gaming, pcmasterrace, gamingmemes, shittyskylines, Steam, GamersRiseUp, Gamingmemesbr, jogatina]
 
 # Filtros de qualidade, valem para todas as fontes.
 qualidade:
