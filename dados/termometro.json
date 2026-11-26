@@ -9,9 +9,10 @@
     "circojeca": 0.5,
     "dankmemes": 0.0,
     "dontstarve": -0.75,
-    "eu_nvr": 0.0,
+    "eu_nvr": 0.35,
     "me_irl": 0.25
   },
+  "afinidade_categorias": {},
   "evolucao": [
     {
       "quando": "2026-11-21T16:02:46-03:00",
@@ -469,6 +470,13 @@
       "engracado": 0,
       "curti": 0,
       "sem_graca": 1,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575496588611031142": {
+      "engracado": 1,
+      "curti": 0,
+      "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     }
