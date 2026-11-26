@@ -1,27 +1,27 @@
 {
-  "regua": 5.0,
+  "regua": 4.85,
   "afinidade": {
     "HUEstation": -1.0,
     "HistoryMemes": 0.35,
     "HolUp": 2.25,
     "LeagueOfMemes": 0.3,
     "MemesBrasil": 0.0,
-    "MinecraftMemes": -1.0,
+    "MinecraftMemes": -0.65,
     "ShitpostBR": -1.0,
     "circojeca": 0.5,
     "dankmemes": 0.35,
     "dontstarve": -1.45,
     "eu_nvr": 1.75,
     "gamememes": 0.7,
-    "jogatina": 0.0,
+    "jogatina": 0.35,
     "me_irl": 0.25,
     "terriblefacebookmemes": 0.0,
     "wholesomememes": 0.7
   },
   "afinidade_categorias": {
-    "⛏️ Minecraft": 0.15,
+    "⛏️ Minecraft": 0.3,
     "🇧🇷 Brasileiros": 0.3,
-    "🎮 Jogos em geral": 0.3,
+    "🎮 Jogos em geral": 0.45,
     "👴 Memes de velho": 0.0,
     "😂 Gerais": 0.3,
     "🤓 Nerd": 0.15
@@ -63,6 +63,10 @@
     {
       "quando": "2026-11-24T23:00:45-03:00",
       "regua": 5.0
+    },
+    {
+      "quando": "2026-11-26T20:00:49-03:00",
+      "regua": 4.85
     }
   ],
   "votos_contados": {
@@ -537,17 +541,24 @@
     },
     "1575602228373364989": {
       "engracado": 0,
-      "curti": 1,
+      "curti": 2,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575617339381256222": {
       "engracado": 0,
-      "curti": 0,
+      "curti": 1,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
+    },
+    "1575632451127214212": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 1
     }
   }
 }
