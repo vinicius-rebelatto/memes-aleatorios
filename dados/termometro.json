@@ -11,11 +11,13 @@
     "dontstarve": -0.75,
     "eu_nvr": 0.35,
     "gamememes": 0.0,
-    "me_irl": 0.25
+    "me_irl": 0.25,
+    "wholesomememes": 0.0
   },
   "afinidade_categorias": {
     "🇧🇷 Brasileiros": 0.0,
-    "🎮 Jogos em geral": 0.0
+    "🎮 Jogos em geral": 0.0,
+    "😂 Gerais": 0.0
   },
   "evolucao": [
     {
@@ -492,6 +494,13 @@
       "passou_do_ponto": 0
     },
     "1575526737167523862": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575541837165371474": {
       "engracado": 0,
       "curti": 0,
       "sem_graca": 0,
