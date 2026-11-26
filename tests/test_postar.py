@@ -190,7 +190,7 @@ def test_votos_da_galera_mexem_na_regua_antes_do_post(config, tmp_path):
     _, discord, _, termometro = rodar(config, tmp_path, "agenda", quando, discord=discord, historico=historico)
 
     assert termometro.regua == pytest.approx(3.3)
-    assert termometro.afinidade == {"eu_nvr": pytest.approx(0.25)}
+    assert termometro.afinidade == {"eu_nvr": pytest.approx(0.35)}
     assert "embeds" not in discord.enviadas[0]["corpo"]  # o termômetro não aparece no post
 
 

@@ -43,6 +43,7 @@ class Meme:
     nsfw: bool = False
     nivel: float | None = None  # nível de peso usado na régua (fonte + 1 se for NSFW)
     id_reddit: int | None = None
+    categoria: str = ""
 
 
 def _normalizar(texto: str) -> str:
@@ -158,9 +159,15 @@ def pontuar(meme: Meme, id_mais_novo: int | None, regua: float | None = None) ->
 
 
 def candidatos_da_fonte(
-    fonte: Fonte, memes: list[Meme], ja_postado: Callable[[Meme], bool], permitir_nsfw: bool
+    fonte: Fonte,
+    memes: list[Meme],
+    ja_postado: Callable[[Meme], bool],
+    permitir_nsfw: bool,
+    votos_minimos: int = 0,
+    bloquear: tuple[str, ...] = (),
 ) -> tuple[list[Meme], int | None]:
-    """Os memes que podem sair: inéditos, recentes e (se o canal não for +18) sem NSFW.
+    """Os memes que podem sair: inéditos, recentes, com votos suficientes no Reddit, sem palavra
+    bloqueada no título e (se o canal não for +18) sem NSFW.
 
     Devolve (candidatos, id do post mais novo da busca), que serve para calcular a idade.
     """
@@ -173,6 +180,12 @@ def candidatos_da_fonte(
             continue
         if idade is not None and idade > IDADE_MAXIMA_DIAS:
             continue
+        if meme.votos_reddit < votos_minimos:
+            continue
+        titulo = meme.titulo.lower()
+        if any(palavra in titulo for palavra in bloquear):
+            continue
+        meme.categoria = fonte.categoria
         if fonte.segue_a_regua:
             meme.nivel = min(5.0, fonte.nivel + (1 if meme.nsfw else 0))
         candidatos.append(meme)
@@ -201,11 +214,10 @@ def escolher_do_reddit(
     surpresa = termometro is None or rng.random() < config.surpresa
     if termometro is None:
         pesos = {fonte.subreddit: fonte.peso for fonte in config.fontes}
-    elif surpresa:
-        log("🎲 Post surpresa: sorteando a fonte sem olhar a régua.")
-        pesos = {fonte.subreddit: termometro.peso_surpresa(fonte) for fonte in config.fontes}
     else:
-        pesos = {fonte.subreddit: termometro.peso_da_fonte(fonte) for fonte in config.fontes}
+        if surpresa:
+            log("🎲 Post surpresa: sorteando a categoria sem olhar a régua.")
+        pesos = termometro.pesos(config.fontes, surpresa=surpresa)
     regua = None if surpresa else termometro.regua
 
     for fonte in ordem_das_fontes(config.fontes, pesos, rng):
@@ -214,7 +226,9 @@ def escolher_do_reddit(
         except (requests.RequestException, ErroDeFonte, ValueError) as erro:
             log(f"⚠️ Não consegui buscar memes de r/{fonte.subreddit}: {erro}")
             continue
-        candidatos, id_mais_novo = candidatos_da_fonte(fonte, memes, ja_postado, permitir_nsfw)
+        candidatos, id_mais_novo = candidatos_da_fonte(
+            fonte, memes, ja_postado, permitir_nsfw, config.votos_minimos, config.bloquear
+        )
         if candidatos:
             return max(candidatos, key=lambda meme: pontuar(meme, id_mais_novo, regua))
         log(f"ℹ️ r/{fonte.subreddit}: nenhum meme novo agora (todos já saíram ou foram filtrados).")

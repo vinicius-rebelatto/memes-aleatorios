@@ -144,7 +144,7 @@ def test_a_regua_puxa_as_fontes_com_nivel_mais_perto(config, tmp_path):
     sessao = SessaoPorSubreddit(
         {"eu_nvr": resposta_da_api(item_da_api(1)), "me_irl": resposta_da_api(item_da_api(2, subreddit="me_irl"))}
     )
-    leve = Termometro(tmp_path / "t.json", regua=2.0)  # perto de me_irl (3), longe de eu_nvr (4)
+    leve = Termometro(tmp_path / "t.json", regua=1.0)  # mais perto de me_irl (3) que de eu_nvr (4)
     meme = escolher_do_reddit(config, nunca_postado, RngFixo(), sessao, log=calado, termometro=leve)
     assert meme.subreddit == "me_irl"
 
@@ -295,3 +295,12 @@ def test_enviados_pelo_comando_le_o_worker_e_aguenta_falha():
     assert sessao.urls == ["https://w.exemplo/enviados"]
     assert enviados_pelo_comando(None) == set()
     assert enviados_pelo_comando("https://w.exemplo", SessaoDeImagem(requests.ConnectionError("x"))) == set()
+
+
+def test_filtros_de_qualidade_tiram_meme_com_poucos_votos_ou_palavra_bloqueada(config, tmp_path):
+    config = replace(config, votos_minimos=100, bloquear=("c.eed",))
+    itens = [item_da_api(1, ups=50), item_da_api(2, ups=900), item_da_api(3, ups=5000)]
+    itens[2]["title"] = "Finding a crafting table | C.EED"
+    sessao = SessaoPorSubreddit({"eu_nvr": resposta_da_api(*itens), "me_irl": resposta_da_api()})
+    meme = escolher_do_reddit(config, nunca_postado, RngFixo(), sessao, log=calado)
+    assert meme.link == "https://redd.it/post2"

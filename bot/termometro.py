@@ -25,9 +25,10 @@ from .discord_api import ms_do_snowflake
 from .util import contar_reacao
 
 PASSO_DA_REGUA = 0.15  # quanto cada voto 🌶️ ou 🚫 move a régua
-PASSO_DA_AFINIDADE = 0.25  # quanto cada voto 😂 ou 😐 move a afinidade da fonte
+PASSO_DA_AFINIDADE = 0.35  # quanto cada 😂/👍 ou 😐 move a nota do subreddit
+PASSO_DA_CATEGORIA = 0.15  # e a nota da categoria dele
 AFINIDADE_MAXIMA = 3.0
-ESPALHAMENTO = 0.8  # o quanto uma fonte pode estar longe da régua e ainda aparecer
+ESPALHAMENTO = 1.2  # o quanto uma categoria pode estar longe da régua e ainda aparecer
 DIAS_CONTANDO_VOTOS = 7  # votos em memes com mais de 7 dias não mexem mais no termômetro
 REGUA_MINIMA, REGUA_MAXIMA = 1.0, 5.0
 TAMANHO_DA_EVOLUCAO = 500
@@ -39,13 +40,13 @@ def _limitar(valor: float, minimo: float, maximo: float) -> float:
 
 
 def proximidade(nivel: float, regua: float) -> float:
-    """1.0 quando o nível é igual à régua; cai rápido conforme se afasta (0.46 a 1 nível, 0.04 a 2)."""
+    """1.0 quando o nível é igual à régua; cai conforme se afasta (0.71 a 1 nível, 0.25 a 2, 0.04 a 3)."""
     return math.exp(-((nivel - regua) ** 2) / (2 * ESPALHAMENTO**2))
 
 
 def multiplicador(afinidade: float) -> float:
-    """Afinidade +3 deixa a fonte ~4,5x mais provável; -3, ~4,5x menos."""
-    return math.exp(afinidade / 2)
+    """Nota +3 deixa a fonte ~20x mais provável; -3, ~20x menos (some quase de vez)."""
+    return math.exp(afinidade)
 
 
 def numero_br(valor: float, casas: int = 1) -> str:
@@ -66,12 +67,16 @@ class Termometro:
         afinidade: dict | None = None,
         votos_contados: dict | None = None,
         evolucao: list | None = None,
+        afinidade_categorias: dict | None = None,
     ):
         self.caminho = Path(caminho)
         self.regua = _limitar(float(regua), REGUA_MINIMA, REGUA_MAXIMA)
         self.afinidade: dict[str, float] = {str(k): float(v) for k, v in (afinidade or {}).items()}
         self.votos_contados: dict[str, dict[str, int]] = dict(votos_contados or {})
         self.evolucao: list[dict] = list(evolucao or [])
+        self.afinidade_categorias: dict[str, float] = {
+            str(k): float(v) for k, v in (afinidade_categorias or {}).items()
+        }
 
     @classmethod
     def carregar(cls, caminho: Path | str, regua_inicial: float = 3.0) -> "Termometro":
@@ -88,6 +93,7 @@ class Termometro:
             afinidade=dados.get("afinidade"),
             votos_contados=dados.get("votos_contados"),
             evolucao=dados.get("evolucao"),
+            afinidade_categorias=dados.get("afinidade_categorias"),
         )
 
     def salvar(self) -> None:
@@ -95,6 +101,7 @@ class Termometro:
         dados = {
             "regua": round(self.regua, 3),
             "afinidade": dict(sorted(self.afinidade.items())),
+            "afinidade_categorias": dict(sorted(self.afinidade_categorias.items())),
             "evolucao": self.evolucao,
             "votos_contados": self.votos_contados,
         }
@@ -114,11 +121,14 @@ class Termometro:
         self.regua = round(_limitar(self.regua + movimento, REGUA_MINIMA, REGUA_MAXIMA), 3)
 
         if registro.get("fonte") == "reddit" and registro.get("subreddit"):
+            saldo = diferenca["engracado"] + diferenca.get("curti", 0) - diferenca["sem_graca"]
             subreddit = registro["subreddit"]
-            nota = self.afinidade.get(subreddit, 0.0) + PASSO_DA_AFINIDADE * (
-                diferenca["engracado"] + diferenca["curti"] - diferenca["sem_graca"]
-            )
+            nota = self.afinidade.get(subreddit, 0.0) + PASSO_DA_AFINIDADE * saldo
             self.afinidade[subreddit] = round(_limitar(nota, -AFINIDADE_MAXIMA, AFINIDADE_MAXIMA), 3)
+            if registro.get("categoria"):
+                categoria = registro["categoria"]
+                nota = self.afinidade_categorias.get(categoria, 0.0) + PASSO_DA_CATEGORIA * saldo
+                self.afinidade_categorias[categoria] = round(_limitar(nota, -AFINIDADE_MAXIMA, AFINIDADE_MAXIMA), 3)
 
         self.votos_contados[str(mensagem["id"])] = atuais
         return diferenca
@@ -126,7 +136,7 @@ class Termometro:
     def atualizar(self, mensagens: list[dict], historico, reacoes: Reacoes, quando: datetime) -> bool:
         """Conta os votos novos de todos os memes recentes do bot. Devolve True se algo mudou."""
         limite_ms = (quando - timedelta(days=DIAS_CONTANDO_VOTOS)).timestamp() * 1000
-        antes = json.dumps([self.regua, self.afinidade, self.votos_contados], sort_keys=True)
+        antes = json.dumps([self.regua, self.afinidade, self.afinidade_categorias, self.votos_contados], sort_keys=True)
 
         for mensagem in mensagens:
             registro = historico.por_mensagem(mensagem.get("id", ""))
@@ -140,7 +150,10 @@ class Termometro:
             for mensagem_id, votos in self.votos_contados.items()
             if ms_do_snowflake(mensagem_id) >= limite_ms
         }
-        mudou = json.dumps([self.regua, self.afinidade, self.votos_contados], sort_keys=True) != antes
+        mudou = (
+            json.dumps([self.regua, self.afinidade, self.afinidade_categorias, self.votos_contados], sort_keys=True)
+            != antes
+        )
         if not self.evolucao or self.evolucao[-1].get("regua") != self.regua:
             self.evolucao.append({"quando": quando.isoformat(timespec="seconds"), "regua": self.regua})
             self.evolucao = self.evolucao[-TAMANHO_DA_EVOLUCAO:]
@@ -149,28 +162,49 @@ class Termometro:
 
     # ---- leitura -----------------------------------------------------------------
 
-    def peso_surpresa(self, fonte: Fonte) -> float:
-        """Chance relativa num post surpresa: ignora a régua, mas não os 😂 e 😐 da galera."""
-        return fonte.peso * multiplicador(self.afinidade.get(fonte.subreddit, 0.0))
+    def pesos(self, fontes: tuple[Fonte, ...], surpresa: bool = False) -> dict[str, float]:
+        """Chance de cada subreddit ser a primeira tentativa (somando 1), em dois passos:
 
-    def peso_da_fonte(self, fonte: Fonte) -> float:
-        """Chance relativa num post normal: peso × perto da régua × afinidade.
-
-        Fonte sem nível (ex.: memes de jogo) fica fora da régua: sai sempre na mesma proporção.
+        1. sorteia a categoria: peso × perto da régua (num post surpresa, sem régua) × nota da categoria;
+        2. dentro dela, o subreddit: peso × nota do subreddit. Quem leva 😂/👍 se sobressai e quem
+           leva 😐 vai sumindo.
+        Fonte sem nível (ex.: jogos) fica fora da régua.
         """
-        perto = proximidade(fonte.nivel, self.regua) if fonte.segue_a_regua else 1.0
-        return perto * self.peso_surpresa(fonte)
+        grupos: dict[str, list[Fonte]] = {}
+        for fonte in fontes:
+            grupos.setdefault(fonte.grupo, []).append(fonte)
+
+        def peso_do_grupo(nome: str, membros: list[Fonte]) -> float:
+            primeira = membros[0]
+            perto = 1.0
+            if not surpresa and primeira.segue_a_regua:
+                perto = proximidade(primeira.nivel, self.regua)
+            if primeira.categoria:
+                return primeira.peso_categoria * perto * multiplicador(self.afinidade_categorias.get(nome, 0.0))
+            return primeira.peso * perto * multiplicador(self.afinidade.get(primeira.subreddit, 0.0))
+
+        pesos_dos_grupos = {nome: peso_do_grupo(nome, membros) for nome, membros in grupos.items()}
+        total = sum(pesos_dos_grupos.values()) or 1.0
+        resultado: dict[str, float] = {}
+        for nome, membros in grupos.items():
+            dentro = {f.subreddit: f.peso * multiplicador(self.afinidade.get(f.subreddit, 0.0)) for f in membros}
+            soma = sum(dentro.values()) or 1.0
+            for subreddit, peso in dentro.items():
+                resultado[subreddit] = pesos_dos_grupos[nome] / total * peso / soma
+        return resultado
 
     def chances(self, fontes: tuple[Fonte, ...], surpresa: float) -> dict[str, float]:
-        """Probabilidade de cada fonte ser a primeira tentativa do próximo meme (somando 1)."""
-
-        def normalizar(pesos: dict[str, float]) -> dict[str, float]:
-            total = sum(pesos.values())
-            return {nome: (peso / total if total else 1 / len(pesos)) for nome, peso in pesos.items()}
-
-        normal = normalizar({fonte.subreddit: self.peso_da_fonte(fonte) for fonte in fontes})
-        sorteio = normalizar({fonte.subreddit: self.peso_surpresa(fonte) for fonte in fontes})
+        """Probabilidade de cada fonte ser a primeira tentativa do próximo meme, contando os posts surpresa."""
+        normal = self.pesos(fontes)
+        sorteio = self.pesos(fontes, surpresa=True)
         return {nome: (1 - surpresa) * normal[nome] + surpresa * sorteio[nome] for nome in normal}
+
+    def chances_das_categorias(self, fontes: tuple[Fonte, ...], surpresa: float) -> dict[str, float]:
+        chances = self.chances(fontes, surpresa)
+        resultado: dict[str, float] = {}
+        for fonte in fontes:
+            resultado[fonte.grupo] = resultado.get(fonte.grupo, 0.0) + chances[fonte.subreddit]
+        return resultado
 
     def variacao_desde(self, momento: datetime) -> float:
         """Quanto a régua andou desde `momento` (positivo = ficou mais pesada)."""

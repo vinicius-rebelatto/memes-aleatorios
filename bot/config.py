@@ -31,6 +31,12 @@ class Fonte:
     subreddit: str
     nivel: float | None = None  # 1 = leve ... 5 = pesado; None = fora da régua (ex.: memes de jogo)
     peso: float = 1.0
+    categoria: str = ""  # vazio = a fonte é uma categoria sozinha
+    peso_categoria: float = 1.0
+
+    @property
+    def grupo(self) -> str:
+        return self.categoria or f"r/{self.subreddit}"
 
     @property
     def segue_a_regua(self) -> bool:
@@ -75,6 +81,8 @@ class Config:
     ranking_incluir_galera: bool = True
     estoque_pasta: Path = RAIZ / "estoque"
     estoque_chance: float = 0.2
+    votos_minimos: int = 0  # meme com menos votos no Reddit do que isso não sai
+    bloquear: tuple[str, ...] = ()  # meme com uma dessas palavras no título não sai
     worker: str | None = None  # endereço do Worker dos comandos (para não repetir o que o /meme mandou)
     historico: Path = RAIZ / "dados" / "historico.json"
     termometro: Path = RAIZ / "dados" / "termometro.json"
@@ -151,21 +159,39 @@ def _nivel(valor, nome: str) -> float:
     return numero
 
 
+def _ler_fonte(item, categoria: str = "", nivel_padrao=None, peso_categoria: float = 1.0) -> Fonte:
+    if isinstance(item, str):
+        item = {"subreddit": item}
+    if not isinstance(item, dict) or not item.get("subreddit"):
+        raise ErroDeConfiguracao("Cada fonte no config.yml precisa ter 'subreddit'.")
+    nome = str(item["subreddit"]).strip().strip("/").removeprefix("r/")
+    peso = _numero(item.get("peso", 1), f"peso de r/{nome}")
+    if peso <= 0:
+        raise ErroDeConfiguracao(f"O peso de r/{nome} precisa ser maior que zero.")
+    nivel = item.get("nivel", nivel_padrao)  # sem nível = fonte fora da régua
+    nivel = None if nivel is None else _nivel(nivel, f"nivel de r/{nome}")
+    return Fonte(nome, nivel, peso, categoria, peso_categoria)
+
+
 def _ler_fontes(dados: dict) -> tuple[Fonte, ...]:
-    fontes = []
-    for item in dados.get("fontes") or []:
-        if isinstance(item, str):
-            item = {"subreddit": item}
-        if not isinstance(item, dict) or not item.get("subreddit"):
-            raise ErroDeConfiguracao("Cada item de 'fontes' no config.yml precisa ter 'subreddit'.")
-        nome = str(item["subreddit"]).strip().strip("/").removeprefix("r/")
-        peso = _numero(item.get("peso", 1), f"peso de r/{nome}")
+    """Fontes em categorias (`categorias`) ou soltas (`fontes`, cada uma vira sua própria categoria)."""
+    fontes = [_ler_fonte(item) for item in dados.get("fontes") or []]
+    for nome, categoria in (dados.get("categorias") or {}).items():
+        if not isinstance(categoria, dict) or not categoria.get("fontes"):
+            raise ErroDeConfiguracao(f"No config.yml, a categoria '{nome}' precisa ter 'fontes'.")
+        peso = _numero(categoria.get("peso", 1), f"peso da categoria {nome}")
         if peso <= 0:
-            raise ErroDeConfiguracao(f"O peso de r/{nome} precisa ser maior que zero.")
-        nivel = item.get("nivel")  # sem nível = fonte fora da régua
-        fontes.append(Fonte(nome, None if nivel is None else _nivel(nivel, f"nivel de r/{nome}"), peso))
+            raise ErroDeConfiguracao(f"O peso da categoria {nome} precisa ser maior que zero.")
+        nivel = categoria.get("nivel")
+        if nivel is not None:
+            _nivel(nivel, f"nivel da categoria {nome}")
+        fontes += [_ler_fonte(item, str(nome), nivel, peso) for item in categoria["fontes"]]
     if not fontes:
-        raise ErroDeConfiguracao("O config.yml precisa ter pelo menos uma fonte em 'fontes'.")
+        raise ErroDeConfiguracao("O config.yml precisa ter pelo menos uma fonte (em 'categorias' ou 'fontes').")
+    nomes = [fonte.subreddit.lower() for fonte in fontes]
+    repetidas = sorted({nome for nome in nomes if nomes.count(nome) > 1})
+    if repetidas:
+        raise ErroDeConfiguracao(f"No config.yml, cada subreddit só pode aparecer uma vez: {', '.join(repetidas)}.")
     return tuple(fontes)
 
 
@@ -216,6 +242,10 @@ def carregar_config(caminho: Path | str = CONFIG_PADRAO) -> Config:
         ranking_dia=_dia_da_semana(ranking.get("dia", "domingo")),
         ranking_horario=_horario(ranking.get("horario", "21:00"), "ranking.horario"),
         fontes=_ler_fontes(dados),
+        votos_minimos=int(_numero(_secao(dados, "qualidade").get("votos_minimos", 0), "qualidade.votos_minimos")),
+        bloquear=tuple(
+            str(palavra).strip().lower() for palavra in _secao(dados, "qualidade").get("bloquear") or [] if palavra
+        ),
         reacoes=_ler_reacoes(dados),
         votos_para_remover=votos_para_remover,
         regua_inicial=_nivel(termometro.get("regua_inicial", 3), "termometro.regua_inicial"),

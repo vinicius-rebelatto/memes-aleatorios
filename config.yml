@@ -12,38 +12,57 @@ agenda:
     ]
   tolerancia_minutos: 120
 
-# De onde vêm os memes (subreddits). Cada fonte pode ter:
-#   nivel: de 1 (bem leve) a 5 (pesado). O bot prefere as fontes com nível perto da
-#          régua, que a galera move com 🌶️ e 🚫. SEM nível, a fonte fica fora da régua
-#          e aparece sempre na mesma proporção (bom para memes de jogo).
-#   peso:  empurrão fixo (padrão 1). 0.5 = metade das chances; 2 = o dobro.
-# Os 😂 e 😐 de cada meme fazem a fonte dele aparecer mais ou menos.
-fontes:
-  # Memes brasileiros
-  - subreddit: DiretoDoZapZap
+# De onde vêm os memes: categorias, cada uma com seus subreddits.
+#
+# Como o bot escolhe:
+#   1. sorteia a CATEGORIA: as com nível perto da régua (🌶️ sobe, 🚫 desce) e que levam
+#      mais 😂/👍 do que 😐 saem mais. Sem `nivel`, a categoria fica fora da régua.
+#   2. dentro dela, sorteia o SUBREDDIT: os que levam 😂/👍 se sobressaem e os que levam
+#      😐 vão sumindo (até ~20x menos chance).
+#   `peso` dá um empurrão fixo (padrão 1): 2 = o dobro de chance, 0.5 = metade.
+#   Cada subreddit pode ter seu próprio `peso` e `nivel`, como o dankmemes abaixo.
+categorias:
+  "🇧🇷 Brasileiros":
+    nivel: 4
+    peso: 1.5
+    fontes: [MemesBrasil, MemesBR, eu_nvr, circojeca, HUEstation, DiretoDoZapZap]
+
+  "💀 Humor pesado":
+    nivel: 5
+    fontes:
+      - HolUp
+      - darkmemers
+      - subreddit: dankmemes
+        nivel: 4
+      - subreddit: 2meirl4meirl
+        nivel: 4
+
+  "😂 Gerais":
     nivel: 2
-  - subreddit: MemesBR
-    nivel: 2
-  - subreddit: HUEstation
+    fontes: [memes, me_irl, BikiniBottomTwitter, funny, wholesomememes]
+
+  "🌀 Absurdos":
     nivel: 3
-  - subreddit: eu_nvr
-    nivel: 4
-  - subreddit: circojeca
-    nivel: 5
+    fontes: [surrealmemes, comedyheaven, ComedyCemetery]
 
-  # Humor mais pesado (em inglês)
-  - subreddit: dankmemes
-    nivel: 4
-  - subreddit: HolUp
-    nivel: 5
+  "👴 Memes de velho":
+    nivel: 2
+    fontes: [OldPeopleFacebook, terriblefacebookmemes, boomershumor]
 
-  # Jogos (em inglês): fora da régua, saem sempre na mesma proporção
-  - subreddit: leagueofmemes
-    peso: 0.5
-  - subreddit: MinecraftMemes
-    peso: 0.5
-  - subreddit: dontstarve
-    peso: 0.3
+  "🎮 Jogos":
+    peso: 0.6
+    fontes: [LeagueOfMemes, MinecraftMemes, PhoenixSC, GameMemes, Gamingcirclejerk]
+
+  "🤓 Nerd":
+    peso: 0.4
+    fontes: [HistoryMemes, ProgrammerHumor, PrequelMemes]
+
+# Filtros de qualidade, valem para todas as fontes.
+qualidade:
+  # Meme com menos votos que isso no Reddit não sai (corta post fraco e sem graça).
+  votos_minimos: 30
+  # Meme com uma dessas palavras no título não sai (desenhos e fan art não são meme).
+  bloquear: ["c.eed", "fanart", "fan art", "my art", "i drew", "commission", "speedpaint"]
 
 # As reações que o bot coloca em cada meme.
 reacoes:

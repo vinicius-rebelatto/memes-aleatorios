@@ -124,3 +124,37 @@ def test_dia_da_semana_com_feira_e_sem_acento(tmp_path):
     caminho = tmp_path / "config.yml"
     caminho.write_text("fontes: [memes]\nranking:\n  dia: terca-feira\n", encoding="utf-8")
     assert carregar_config(caminho).ranking_dia == 1
+
+
+def test_categorias_com_nivel_peso_e_fontes(tmp_path):
+    caminho = tmp_path / "config.yml"
+    caminho.write_text(
+        """
+categorias:
+  jogos:
+    fontes: [LeagueOfMemes, {subreddit: MinecraftMemes, peso: 0.5}]
+  pesado:
+    nivel: 5
+    peso: 2
+    fontes: [HolUp, {subreddit: dankmemes, nivel: 4}]
+qualidade:
+  votos_minimos: 30
+  bloquear: ["C.EED", "Fan Art"]
+""",
+        encoding="utf-8",
+    )
+    config = carregar_config(caminho)
+    assert [(f.subreddit, f.categoria, f.nivel, f.peso, f.peso_categoria) for f in config.fontes] == [
+        ("LeagueOfMemes", "jogos", None, 1.0, 1.0),
+        ("MinecraftMemes", "jogos", None, 0.5, 1.0),
+        ("HolUp", "pesado", 5.0, 1.0, 2.0),
+        ("dankmemes", "pesado", 4.0, 1.0, 2.0),
+    ]
+    assert (config.votos_minimos, config.bloquear) == (30, ("c.eed", "fan art"))
+
+
+def test_subreddit_repetido_em_duas_categorias_da_erro(tmp_path):
+    caminho = tmp_path / "config.yml"
+    caminho.write_text("categorias:\n  a: {fontes: [memes]}\n  b: {fontes: [Memes]}\n", encoding="utf-8")
+    with pytest.raises(ErroDeConfiguracao, match="memes"):
+        carregar_config(caminho)

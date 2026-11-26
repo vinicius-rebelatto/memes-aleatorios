@@ -49,7 +49,7 @@ def test_engracado_e_sem_graca_mexem_na_afinidade_da_fonte(tmp_path):
     termometro = Termometro(tmp_path / "t.json")
     registro = {"fonte": "reddit", "subreddit": "eu_nvr"}
     termometro.contar_votos({"id": "1", "reactions": reacoes_do_bot(engracado=5, sem_graca=1)}, registro, REACOES)
-    assert termometro.afinidade == {"eu_nvr": pytest.approx(1.0)}
+    assert termometro.afinidade == {"eu_nvr": pytest.approx(1.4)}  # (5 - 1) x 0,35
     # meme do estoque não tem fonte do Reddit: não mexe na afinidade
     termometro.contar_votos({"id": "2", "reactions": reacoes_do_bot(engracado=3)}, {"fonte": "estoque"}, REACOES)
     assert list(termometro.afinidade) == ["eu_nvr"]
@@ -74,7 +74,7 @@ def test_atualizar_so_olha_memes_do_bot_dos_ultimos_dias(tmp_path):
     ]
     assert termometro.atualizar(mensagens, historico, REACOES, AGORA)
     assert termometro.regua == pytest.approx(3.15)
-    assert termometro.afinidade == {"eu_nvr": pytest.approx(0.5)}
+    assert termometro.afinidade == {"eu_nvr": pytest.approx(0.7)}
     assert list(termometro.votos_contados) == [recente]  # o antigo saiu da conta
     assert termometro.evolucao == [{"quando": "2026-11-22T16:17:00-03:00", "regua": 3.15}]
     # nada novo na segunda leitura
@@ -83,26 +83,55 @@ def test_atualizar_so_olha_memes_do_bot_dos_ultimos_dias(tmp_path):
 
 def test_fonte_perto_da_regua_e_com_afinidade_ganha_mais_peso(tmp_path):
     termometro = Termometro(tmp_path / "t.json", regua=3.0)
-    perto, longe = Fonte("perto", nivel=3), Fonte("longe", nivel=5)
-    assert termometro.peso_da_fonte(perto) > 10 * termometro.peso_da_fonte(longe)
-    assert proximidade(4, 3) == pytest.approx(0.457, abs=0.01)
-    termometro.afinidade["perto"] = 2.0
-    assert termometro.peso_da_fonte(perto) == pytest.approx(2.718, abs=0.01)
+    fontes = (Fonte("perto", nivel=3), Fonte("longe", nivel=5))
+    pesos = termometro.pesos(fontes)
+    assert pesos["perto"] > 3 * pesos["longe"]
+    assert proximidade(4, 3) == pytest.approx(0.707, abs=0.01)
+    termometro.afinidade["longe"] = 3.0  # muito 😂 compensa a distância
+    assert termometro.pesos(fontes)["longe"] > termometro.pesos(fontes)["perto"]
 
 
 def test_fonte_sem_nivel_fica_fora_da_regua_mas_segue_os_votos(tmp_path):
-    jogo = Fonte("MinecraftMemes", peso=0.5)
-    for regua in (1.0, 3.0, 5.0):
-        assert Termometro(tmp_path / "t.json", regua=regua).peso_da_fonte(jogo) == pytest.approx(0.5)
+    fontes = (Fonte("pesada", nivel=5), Fonte("MinecraftMemes"))
+    for regua in (1.0, 5.0):
+        pesos = Termometro(tmp_path / "t.json", regua=regua).pesos(fontes)
+        assert pesos["MinecraftMemes"] >= 0.5
     termometro = Termometro(tmp_path / "t.json", regua=5.0, afinidade={"MinecraftMemes": -2.0})
-    assert termometro.peso_da_fonte(jogo) == pytest.approx(0.5 * 0.368, abs=0.01)  # 😐 derrubam até jogo
+    assert termometro.pesos(fontes)["MinecraftMemes"] < 0.15  # 😐 derrubam até jogo
 
 
 def test_post_surpresa_ignora_a_regua_mas_nao_os_votos(tmp_path):
-    termometro = Termometro(tmp_path / "t.json", regua=5.0, afinidade={"leve": 2.0})
-    leve = Fonte("leve", nivel=1)
-    assert termometro.peso_da_fonte(leve) < 0.001  # longe da régua
-    assert termometro.peso_surpresa(leve) == pytest.approx(2.718, abs=0.01)
+    fontes = (Fonte("leve", nivel=1), Fonte("pesada", nivel=5), Fonte("chata", nivel=1))
+    termometro = Termometro(tmp_path / "t.json", regua=5.0, afinidade={"chata": -3.0})
+    assert termometro.pesos(fontes)["leve"] < 0.01  # longe da régua
+    surpresa = termometro.pesos(fontes, surpresa=True)
+    assert surpresa["leve"] == pytest.approx(surpresa["pesada"])
+    assert surpresa["chata"] < 0.05
+
+
+def test_categoria_sorteia_primeiro_e_dentro_dela_o_melhor_subreddit_se_sobressai(tmp_path):
+    fontes = (
+        Fonte("LeagueOfMemes", categoria="jogos"),
+        Fonte("MinecraftMemes", categoria="jogos"),
+        Fonte("dontstarve", categoria="jogos"),
+        Fonte("memes", nivel=2, categoria="gerais"),
+    )
+    termometro = Termometro(tmp_path / "t.json", regua=2.0)
+    pesos = termometro.pesos(fontes)
+    assert pesos["memes"] == pytest.approx(0.5)  # 2 categorias meio a meio, mesmo com 3 subs em jogos
+    assert pesos["LeagueOfMemes"] == pytest.approx(0.5 / 3)
+    termometro.afinidade.update({"LeagueOfMemes": 1.5, "dontstarve": -2.0})
+    pesos = termometro.pesos(fontes)
+    assert pesos["LeagueOfMemes"] > 10 * pesos["dontstarve"]
+    assert pesos["memes"] == pytest.approx(0.5)  # a categoria continua com a mesma fatia
+
+
+def test_votos_tambem_dao_nota_para_a_categoria(tmp_path):
+    termometro = Termometro(tmp_path / "t.json")
+    registro = {"fonte": "reddit", "subreddit": "dontstarve", "categoria": "jogos"}
+    termometro.contar_votos({"id": "1", "reactions": reacoes_do_bot(sem_graca=3)}, registro, REACOES)
+    assert termometro.afinidade_categorias == {"jogos": pytest.approx(-0.45)}
+    assert termometro.afinidade == {"dontstarve": pytest.approx(-1.05)}
 
 
 def test_chances_juntam_posts_normais_e_surpresa(tmp_path):
@@ -110,13 +139,9 @@ def test_chances_juntam_posts_normais_e_surpresa(tmp_path):
     termometro = Termometro(tmp_path / "t.json", regua=5.0)
     chances = termometro.chances(fontes, surpresa=0.2)
     assert sum(chances.values()) == pytest.approx(1.0)
-    # normal: pesada 1 x jogo 0,5 (leve ~0); surpresa: 1, 1 e 0,5
-    assert chances["pesada"] == pytest.approx(0.8 * 2 / 3 + 0.2 * 0.4, abs=0.001)
-    assert chances["jogo"] == pytest.approx(0.8 * 1 / 3 + 0.2 * 0.2, abs=0.001)
-    assert chances["leve"] == pytest.approx(0.2 * 0.4, abs=0.001)
-    assert termometro.chances(fontes, surpresa=0) == pytest.approx(
-        {"pesada": 2 / 3, "leve": 0.0, "jogo": 1 / 3}, abs=1e-3
-    )
+    normal, sorteio = termometro.pesos(fontes), termometro.pesos(fontes, surpresa=True)
+    assert chances["leve"] == pytest.approx(0.8 * normal["leve"] + 0.2 * sorteio["leve"])
+    assert sorteio == pytest.approx({"pesada": 0.4, "leve": 0.4, "jogo": 0.2})
 
 
 def test_variacao_na_semana_e_desenho_da_regua(tmp_path):
@@ -155,5 +180,5 @@ def test_curti_conta_como_voto_positivo_para_a_fonte(tmp_path):
     termometro = Termometro(tmp_path / "t.json")
     registro = {"fonte": "reddit", "subreddit": "eu_nvr"}
     termometro.contar_votos({"id": "1", "reactions": reacoes_do_bot(curti=2, sem_graca=1)}, registro, REACOES)
-    assert termometro.afinidade["eu_nvr"] == pytest.approx(0.25)  # 2 👍 - 1 😐
+    assert termometro.afinidade["eu_nvr"] == pytest.approx(0.35)  # 2 👍 - 1 😐
     assert termometro.regua == 3.0  # 👍 não mexe na régua

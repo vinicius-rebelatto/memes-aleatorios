@@ -471,18 +471,33 @@ export function textoDoTermometro(painel) {
   const linhas = ["🌡️ **Termômetro da galera**"];
   const semana = painel.regua_na_semana ? ` (${painel.regua_na_semana} na semana)` : "";
   linhas.push(`Régua: **${painel.regua_texto ?? `${numeroBr(painel.regua)}/5`}**${semana}`, "");
-  linhas.push("**Chance de cada fonte no próximo meme**");
-  for (const fonte of painel.fontes || []) {
-    const porcento = Math.round(100 * fonte.chance);
-    const chance = porcento < 1 ? "<1%" : `${porcento}%`;
-    linhas.push(`\`${chance.padStart(4)}\` r/${fonte.subreddit}${fonte.nivel == null ? " 🎮" : ""}`);
+  const porcento = (valor) => {
+    const numero = Math.round(100 * valor);
+    return (numero < 1 ? "<1%" : `${numero}%`).padStart(4);
+  };
+  const categorias = Object.entries(painel.categorias || {}).filter(([nome]) => nome);
+  if (categorias.length) {
+    linhas.push("**Chance de cada categoria no próximo meme**");
+    for (const [nome, chance] of categorias) {
+      const melhores = (painel.fontes || [])
+        .filter((fonte) => fonte.categoria === nome)
+        .slice(0, 3)
+        .map((fonte) => `r/${fonte.subreddit}`)
+        .join(", ");
+      linhas.push(`\`${porcento(chance)}\` ${nome}${melhores ? ` · ${melhores}` : ""}`);
+    }
+  } else {
+    linhas.push("**Chance de cada fonte no próximo meme**");
+    for (const fonte of painel.fontes || []) {
+      linhas.push(`\`${porcento(fonte.chance)}\` r/${fonte.subreddit}${fonte.nivel == null ? " 🎮" : ""}`);
+    }
   }
   linhas.push("");
   if (painel.em_alta?.length) linhas.push(`${r.engracado} Em alta: ${painel.em_alta.map((n) => `r/${n}`).join(", ")}`);
   if (painel.em_baixa?.length) linhas.push(`${r.sem_graca} Em baixa: ${painel.em_baixa.map((n) => `r/${n}`).join(", ")}`);
   const quando = quandoFoi(painel.atualizado_em);
   linhas.push(
-    `-# 🎮 = fora da régua · ${r.mais_pesado} sobe a régua, ${r.passou_do_ponto} desce${quando ? ` · atualizado às ${quando}` : ""}`,
+    `-# ${categorias.length ? "" : "🎮 = fora da régua · "}${r.mais_pesado} sobe a régua, ${r.passou_do_ponto} desce${quando ? ` · atualizado às ${quando}` : ""}`,
   );
   return linhas.join("\n");
 }

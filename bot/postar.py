@@ -229,7 +229,10 @@ def diagnosticar_fontes(config: Config, termometro: Termometro, historico: Histo
     chances = termometro.chances(config.fontes, config.surpresa)
     print(f"🌡️ Régua: {termometro.descrever_regua()}")
     print(f"⏰ Horários: {descrever_horarios(config.horarios)}\n")
-    print("Fonte                     nível  chance  memes  novos  nsfw")
+    categorias = termometro.chances_das_categorias(config.fontes, config.surpresa)
+    print("Categorias: " + " · ".join(f"{nome} {numero_br(100 * chance)}%" for nome, chance in categorias.items()))
+    print()
+    print("Fonte                     nível  chance  memes  novos  nsfw  categoria")
     melhores: list[tuple[str, list[Meme]]] = []
     for fonte in config.fontes:
         nivel = numero_br(fonte.nivel) if fonte.segue_a_regua else "fora"
@@ -239,12 +242,14 @@ def diagnosticar_fontes(config: Config, termometro: Termometro, historico: Histo
         except (requests.RequestException, ErroDeFonte, ValueError) as erro:
             print(f"{inicio}  ❌ {erro}")
             continue
-        novos, id_mais_novo = candidatos_da_fonte(fonte, memes, historico.ja_postado, permitir_nsfw=True)
+        novos, id_mais_novo = candidatos_da_fonte(
+            fonte, memes, historico.ja_postado, True, config.votos_minimos, config.bloquear
+        )
         nsfw = sum(1 for meme in novos if meme.nsfw)
-        print(f"{inicio}  {len(memes):>5}  {len(novos):>5}  {nsfw:>4}")
+        print(f"{inicio}  {len(memes):>5}  {len(novos):>5}  {nsfw:>4}  {fonte.categoria}")
         novos.sort(key=lambda meme: -pontuar(meme, id_mais_novo))
         melhores.append((fonte.subreddit, novos[:3]))
-    print("\n(memes = imagens que a meme-api trouxe; novos = inéditas e com menos de 60 dias)")
+    print("\n(memes = imagens que a meme-api trouxe; novos = inéditas, com menos de 60 dias e que passam nos filtros)")
     print("(nível fora = fora da régua; chance = de a fonte ser a primeira tentativa do próximo meme)\n")
     print("Os memes que cada fonte mandaria agora:")
     for subreddit, memes in melhores:

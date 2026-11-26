@@ -39,12 +39,19 @@ def montar_painel(config: Config, termometro: Termometro, historico: Historico, 
         "fontes": [
             {
                 "subreddit": fonte.subreddit,
+                "categoria": fonte.categoria,
                 "nivel": fonte.nivel,
                 "chance": round(chances[fonte.subreddit], 4),
                 "afinidade": termometro.afinidade.get(fonte.subreddit, 0.0),
             }
             for fonte in fontes
         ],
+        "categorias": {
+            nome: round(chance, 4)
+            for nome, chance in sorted(
+                termometro.chances_das_categorias(config.fontes, config.surpresa).items(), key=lambda item: -item[1]
+            )
+        },
         "em_alta": [nome for nome, _ in em_alta],
         "em_baixa": [nome for nome, _ in em_baixa],
         "recentes": historico.links_desde(quando - timedelta(days=DIAS_SEM_REPETIR)),

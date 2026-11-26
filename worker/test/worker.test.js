@@ -328,6 +328,21 @@ describe("/termometro e /ajuda", () => {
     ]);
   });
 
+  it("/termometro com categorias mostra a chance de cada uma e os melhores subreddits", () => {
+    const painel = {
+      ...PAINEL,
+      categorias: { "💀 Humor pesado": 0.6, "🎮 Jogos": 0.4 },
+      fontes: [
+        { subreddit: "HolUp", categoria: "💀 Humor pesado", chance: 0.5 },
+        { subreddit: "LeagueOfMemes", categoria: "🎮 Jogos", chance: 0.3 },
+        { subreddit: "dankmemes", categoria: "💀 Humor pesado", chance: 0.1 },
+      ],
+    };
+    const linhas = textoDoTermometro(painel).split("\n");
+    assert.ok(linhas.includes("` 60%` 💀 Humor pesado · r/HolUp, r/dankmemes"));
+    assert.ok(linhas.includes("` 40%` 🎮 Jogos · r/LeagueOfMemes"));
+  });
+
   it("/termometro sem painel avisa só quem pediu", async () => {
     const { discord } = await rodar(comando("termometro"), internetFalsa({ painel: null }));
     assert.deepEqual(

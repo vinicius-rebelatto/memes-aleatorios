@@ -43,24 +43,30 @@ ligados no [passo 6](#6-relógio-pontual-e-comandos-na-cloudflare-grátis-uns-10
 
 ### 🌡️ O algoritmo da galera
 
-Cada fonte de memes (um subreddit) tem um **nível de peso**, de 1 (leve) a 5 (pesado):
+Os memes vêm de **categorias**, cada uma com 3 ou mais subreddits (lista completa no `config.yml`):
 
-| Nível          | Fontes                                                      |
-| -------------- | ----------------------------------------------------------- |
-| 2              | r/DiretoDoZapZap, r/MemesBR                                 |
-| 3              | r/HUEstation                                                |
-| 4              | r/eu_nvr, r/dankmemes                                       |
-| 5              | r/circojeca, r/HolUp                                        |
-| 🎮 fora da régua | r/leagueofmemes, r/MinecraftMemes, r/dontstarve (jogos)    |
+| Categoria          | Nível        | Subreddits                                                                  |
+| ------------------ | ------------ | --------------------------------------------------------------------------- |
+| 🇧🇷 Brasileiros     | 4            | MemesBrasil, MemesBR, eu_nvr, circojeca, HUEstation, DiretoDoZapZap         |
+| 💀 Humor pesado    | 5            | HolUp, darkmemers, dankmemes, 2meirl4meirl                                  |
+| 😂 Gerais          | 2            | memes, me_irl, BikiniBottomTwitter, funny, wholesomememes                   |
+| 🌀 Absurdos        | 3            | surrealmemes, comedyheaven, ComedyCemetery                                  |
+| 👴 Memes de velho  | 2            | OldPeopleFacebook, terriblefacebookmemes, boomershumor                      |
+| 🎮 Jogos           | fora da régua | LeagueOfMemes, MinecraftMemes, PhoenixSC, GameMemes, Gamingcirclejerk      |
+| 🤓 Nerd            | fora da régua | HistoryMemes, ProgrammerHumor, PrequelMemes                                |
 
-- A **régua** sobe um pouco a cada 🌶️ e desce a cada 🚫.
-- Na hora de escolher, o bot prefere as fontes com nível **perto da régua** e com mais 😂 e 👍 do que 😐.
-- As fontes de **jogos ficam fora da régua**: saem sempre na mesma proporção (cerca de 1 em cada 4 memes),
-  mas os 😂 e 😐 também valem para elas.
-- Dentro da fonte, ele pega o meme **mais votado entre os recentes**: post velho não ganha de post do momento.
-- **1 em cada 5 posts é surpresa**: ignora a régua (mas não os 😂 e 😐) e sorteia a fonte, para o algoritmo
-  não ficar viciado e perceber quando o gosto da galera muda.
-- A régua não aparece nos memes: quem quiser ver usa `/termometro`, e ela sai também no anúncio de domingo.
+A escolha acontece em dois passos:
+
+1. **A categoria.** Saem mais as que têm nível **perto da régua** e levam mais 😂 e 👍 do que 😐. A régua sobe
+   a cada 🌶️ e desce a cada 🚫. Jogos e Nerd ficam fora da régua.
+2. **O subreddit dentro da categoria.** Cada 😂 ou 👍 dá nota para o subreddit e cada 😐 tira. Os bons se
+   sobressaem e os ruins vão sumindo, até umas 20 vezes menos chance.
+
+- Dentro do subreddit, ele pega o meme **mais votado entre os recentes**.
+- **Filtros de qualidade:** meme com menos de 30 votos no Reddit não sai, nem meme com palavras como
+  "fan art" ou "i drew" no título (desenho não é meme).
+- **1 em cada 5 posts é surpresa**: ignora a régua (mas não os votos), para o algoritmo não ficar viciado.
+- A régua não aparece nos memes: quem quiser ver usa `/termometro`, que mostra a chance de cada categoria.
 
 O estado do algoritmo fica em `dados/termometro.json` e o que já foi postado em `dados/historico.json`
 (é por isso que meme não repete). O bot atualiza os dois sozinho.
@@ -194,7 +200,8 @@ Crie o token do item e, uma conta grátis no [cron-job.org](https://cron-job.org
 | ------------------------------------------- | ----------------------------------------------------- |
 | Horários dos memes                          | `config.yml` → `agenda.horarios`                      |
 | Dia e hora do Meme da Semana                | `config.yml` → `ranking.dia` e `ranking.horario`      |
-| Fontes, o nível de cada uma e o peso        | `config.yml` → `fontes` (sem `nivel` = fora da régua) |
+| Categorias, subreddits, nível e peso        | `config.yml` → `categorias` (sem `nivel` = fora da régua) |
+| Filtros de qualidade                        | `config.yml` → `qualidade`                            |
 | Os emojis das reações                       | `config.yml` → `reacoes`                              |
 | Onde a régua começa e a chance de surpresa  | `config.yml` → `termometro`                           |
 | Liberar ou bloquear NSFW                    | `config.yml` → `nsfw.permitir`                        |
@@ -205,11 +212,10 @@ Dá para editar direto pelo site do GitHub (ícone de lápis no arquivo → **Co
 acorda de hora em hora, os horários podem ser qualquer hora cheia ou quebrada (ex.: `"19:30"`); o bot posta
 na primeira acordada dentro da janela de cada horário.
 
-**Quer memes mais pesados ou mais leves do que a lista permite?** A régua só vai até as fontes da lista:
-adicione fontes novas com o nível certo em `config.yml` e rode o **Postar meme** no modo **simular**. O log
-mostra se cada fonte funciona, quantos memes novos ela tem e os títulos dos que ela mandaria agora. Mais
-jogos? Adicione o subreddit sem `nivel` e com `peso: 0.5`, como os outros jogos. Os comandos acompanham o
-`config.yml` sozinhos, a partir do próximo post do bot.
+**Quer outra categoria ou mais subreddits?** Adicione no `config.yml` (na categoria certa, ou numa categoria
+nova com `nivel` e `fontes`) e rode o **Postar meme** no modo **simular**. O log mostra a chance de cada
+categoria, se cada subreddit funciona, quantos memes novos ele tem e os títulos dos que ele mandaria agora.
+Os comandos acompanham o `config.yml` sozinhos, a partir do próximo post do bot.
 
 ## 📦 Estoque da galera
 

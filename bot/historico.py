@@ -79,6 +79,7 @@ class Historico:
             "fonte": meme.fonte,
             "chave": meme.chave,
             "subreddit": meme.subreddit,
+            "categoria": meme.categoria,
             "titulo": meme.titulo,
             "link": meme.link,
             "imagem": meme.imagem,
