@@ -49,9 +49,30 @@ categorias:
     nivel: 2
     fontes: [OldPeopleFacebook, terriblefacebookmemes, boomershumor]
 
-  "🎮 Jogos":
-    peso: 0.6
-    fontes: [LeagueOfMemes, MinecraftMemes, PhoenixSC, GameMemes, Gamingcirclejerk]
+  # Jogos ficam fora da régua. Nos subs de comunidade (peso menor) nem tudo é meme:
+  # os 😐 da galera derrubam eles se não prestarem.
+  "⚔️ League of Legends":
+    peso: 0.3
+    fontes:
+      - LeagueOfMemes
+      - {subreddit: SKTT1, peso: 0.4}
+      - {subreddit: ARAM, peso: 0.4}
+
+  "⛏️ Minecraft":
+    peso: 0.3
+    fontes:
+      - MinecraftMemes
+      - PhoenixSC
+      - {subreddit: Minecraft2, peso: 0.5}
+
+  "🎮 Jogos em geral":
+    peso: 0.4
+    fontes:
+      - GameMemes
+      - Gamingcirclejerk
+      - pcmasterrace
+      - shittyskylines
+      - {subreddit: jogatina, peso: 0.5}
 
   "🤓 Nerd":
     peso: 0.4

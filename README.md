@@ -52,7 +52,9 @@ Os memes vêm de **categorias**, cada uma com 3 ou mais subreddits (lista comple
 | 😂 Gerais          | 2            | memes, me_irl, BikiniBottomTwitter, funny, wholesomememes                   |
 | 🌀 Absurdos        | 3            | surrealmemes, comedyheaven, ComedyCemetery                                  |
 | 👴 Memes de velho  | 2            | OldPeopleFacebook, terriblefacebookmemes, boomershumor                      |
-| 🎮 Jogos           | fora da régua | LeagueOfMemes, MinecraftMemes, PhoenixSC, GameMemes, Gamingcirclejerk      |
+| ⚔️ League of Legends | fora da régua | LeagueOfMemes, SKTT1, ARAM                                              |
+| ⛏️ Minecraft       | fora da régua | MinecraftMemes, PhoenixSC, Minecraft2                                       |
+| 🎮 Jogos em geral  | fora da régua | GameMemes, Gamingcirclejerk, pcmasterrace, shittyskylines, jogatina         |
 | 🤓 Nerd            | fora da régua | HistoryMemes, ProgrammerHumor, PrequelMemes                                |
 
 A escolha acontece em dois passos:
