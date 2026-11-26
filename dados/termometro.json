@@ -11,17 +11,18 @@
     "circojeca": 0.5,
     "dankmemes": 0.35,
     "dontstarve": -1.45,
-    "eu_nvr": 1.05,
-    "gamememes": 0.35,
+    "eu_nvr": 1.75,
+    "gamememes": 0.7,
     "me_irl": 0.25,
     "terriblefacebookmemes": 0.0,
-    "wholesomememes": 0.35
+    "wholesomememes": 0.7
   },
   "afinidade_categorias": {
-    "🇧🇷 Brasileiros": 0.15,
-    "🎮 Jogos em geral": 0.15,
+    "⛏️ Minecraft": 0.0,
+    "🇧🇷 Brasileiros": 0.3,
+    "🎮 Jogos em geral": 0.3,
     "👴 Memes de velho": 0.0,
-    "😂 Gerais": 0.15,
+    "😂 Gerais": 0.3,
     "🤓 Nerd": 0.15
   },
   "evolucao": [
@@ -485,7 +486,7 @@
       "passou_do_ponto": 0
     },
     "1575496588611031142": {
-      "engracado": 2,
+      "engracado": 3,
       "curti": 0,
       "sem_graca": 0,
       "mais_pesado": 0,
@@ -493,21 +494,21 @@
     },
     "1575511671999561885": {
       "engracado": 0,
-      "curti": 1,
+      "curti": 2,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575526737167523862": {
       "engracado": 0,
-      "curti": 1,
+      "curti": 2,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575541837165371474": {
       "engracado": 1,
-      "curti": 0,
+      "curti": 1,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
@@ -527,6 +528,13 @@
       "passou_do_ponto": 0
     },
     "1575587137485799618": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575602228373364989": {
       "engracado": 0,
       "curti": 0,
       "sem_graca": 0,

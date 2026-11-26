@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-11-26T17:00:42-03:00",
+  "atualizado_em": "2026-11-26T18:00:42-03:00",
   "regua": 5.0,
   "regua_texto": "5,0/5 🟩🟩🟨🟧🟥",
   "regua_na_semana": "🌶️ subiu 2,0",
@@ -15,261 +15,261 @@
   },
   "fontes": [
     {
-      "subreddit": "HolUp",
-      "categoria": "💀 Humor pesado",
-      "nivel": 5.0,
-      "chance": 0.163,
-      "afinidade": 2.25
-    },
-    {
       "subreddit": "eu_nvr",
       "categoria": "🇧🇷 Brasileiros",
       "nivel": 4.0,
-      "chance": 0.1041,
-      "afinidade": 1.05
+      "chance": 0.1665,
+      "afinidade": 1.75
+    },
+    {
+      "subreddit": "HolUp",
+      "categoria": "💀 Humor pesado",
+      "nivel": 5.0,
+      "chance": 0.1524,
+      "afinidade": 2.25
     },
     {
       "subreddit": "circojeca",
       "categoria": "🇧🇷 Brasileiros",
       "nivel": 4.0,
-      "chance": 0.0601,
+      "chance": 0.0477,
       "afinidade": 0.5
     },
     {
       "subreddit": "HistoryMemes",
       "categoria": "🤓 Nerd",
       "nivel": null,
-      "chance": 0.0428,
+      "chance": 0.04,
       "afinidade": 0.35
     },
     {
       "subreddit": "LeagueOfMemes",
       "categoria": "⚔️ League of Legends",
       "nivel": null,
-      "chance": 0.0418,
+      "chance": 0.0391,
       "afinidade": 0.3
     },
     {
       "subreddit": "PhoenixSC",
       "categoria": "⛏️ Minecraft",
       "nivel": null,
-      "chance": 0.0378,
+      "chance": 0.0354,
       "afinidade": 0.0
     },
     {
       "subreddit": "MemesBrasil",
       "categoria": "🇧🇷 Brasileiros",
       "nivel": 4.0,
-      "chance": 0.0364,
+      "chance": 0.0289,
       "afinidade": 0.0
     },
     {
       "subreddit": "MemesBR",
       "categoria": "🇧🇷 Brasileiros",
       "nivel": 4.0,
-      "chance": 0.0364,
+      "chance": 0.0289,
       "afinidade": 0.0
     },
     {
       "subreddit": "DiretoDoZapZap",
       "categoria": "🇧🇷 Brasileiros",
       "nivel": 4.0,
-      "chance": 0.0364,
+      "chance": 0.0289,
       "afinidade": 0.0
     },
     {
       "subreddit": "ProgrammerHumor",
       "categoria": "🤓 Nerd",
       "nivel": null,
-      "chance": 0.0301,
+      "chance": 0.0282,
       "afinidade": 0.0
     },
     {
       "subreddit": "PrequelMemes",
       "categoria": "🤓 Nerd",
       "nivel": null,
-      "chance": 0.0301,
+      "chance": 0.0282,
       "afinidade": 0.0
-    },
-    {
-      "subreddit": "surrealmemes",
-      "categoria": "🌀 Absurdos",
-      "nivel": 3.0,
-      "chance": 0.0252,
-      "afinidade": 0.0
-    },
-    {
-      "subreddit": "comedyheaven",
-      "categoria": "🌀 Absurdos",
-      "nivel": 3.0,
-      "chance": 0.0252,
-      "afinidade": 0.0
-    },
-    {
-      "subreddit": "ComedyCemetery",
-      "categoria": "🌀 Absurdos",
-      "nivel": 3.0,
-      "chance": 0.0252,
-      "afinidade": 0.0
-    },
-    {
-      "subreddit": "dankmemes",
-      "categoria": "💀 Humor pesado",
-      "nivel": 4.0,
-      "chance": 0.0244,
-      "afinidade": 0.35
     },
     {
       "subreddit": "GameMemes",
       "categoria": "🎮 Jogos em geral",
       "nivel": null,
-      "chance": 0.0229,
+      "chance": 0.0249,
       "afinidade": 0.0
     },
     {
       "subreddit": "Gamingcirclejerk",
       "categoria": "🎮 Jogos em geral",
       "nivel": null,
-      "chance": 0.0229,
+      "chance": 0.0249,
       "afinidade": 0.0
     },
     {
       "subreddit": "pcmasterrace",
       "categoria": "🎮 Jogos em geral",
       "nivel": null,
-      "chance": 0.0229,
+      "chance": 0.0249,
       "afinidade": 0.0
     },
     {
       "subreddit": "shittyskylines",
       "categoria": "🎮 Jogos em geral",
       "nivel": null,
-      "chance": 0.0229,
+      "chance": 0.0249,
       "afinidade": 0.0
+    },
+    {
+      "subreddit": "surrealmemes",
+      "categoria": "🌀 Absurdos",
+      "nivel": 3.0,
+      "chance": 0.0235,
+      "afinidade": 0.0
+    },
+    {
+      "subreddit": "comedyheaven",
+      "categoria": "🌀 Absurdos",
+      "nivel": 3.0,
+      "chance": 0.0235,
+      "afinidade": 0.0
+    },
+    {
+      "subreddit": "ComedyCemetery",
+      "categoria": "🌀 Absurdos",
+      "nivel": 3.0,
+      "chance": 0.0235,
+      "afinidade": 0.0
+    },
+    {
+      "subreddit": "dankmemes",
+      "categoria": "💀 Humor pesado",
+      "nivel": 4.0,
+      "chance": 0.0228,
+      "afinidade": 0.35
     },
     {
       "subreddit": "Minecraft2",
       "categoria": "⛏️ Minecraft",
       "nivel": null,
-      "chance": 0.0189,
+      "chance": 0.0177,
       "afinidade": 0.0
     },
     {
       "subreddit": "darkmemers",
       "categoria": "💀 Humor pesado",
       "nivel": 5.0,
-      "chance": 0.0172,
+      "chance": 0.0161,
       "afinidade": 0.0
     },
     {
       "subreddit": "2meirl4meirl",
       "categoria": "💀 Humor pesado",
       "nivel": 4.0,
-      "chance": 0.0172,
-      "afinidade": 0.0
-    },
-    {
-      "subreddit": "HUEstation",
-      "categoria": "🇧🇷 Brasileiros",
-      "nivel": 4.0,
-      "chance": 0.0134,
-      "afinidade": -1.0
-    },
-    {
-      "subreddit": "SKTT1",
-      "categoria": "⚔️ League of Legends",
-      "nivel": null,
-      "chance": 0.0124,
-      "afinidade": 0.0
-    },
-    {
-      "subreddit": "ARAM",
-      "categoria": "⚔️ League of Legends",
-      "nivel": null,
-      "chance": 0.0124,
-      "afinidade": 0.0
-    },
-    {
-      "subreddit": "OldPeopleFacebook",
-      "categoria": "👴 Memes de velho",
-      "nivel": 2.0,
-      "chance": 0.0118,
-      "afinidade": 0.0
-    },
-    {
-      "subreddit": "terriblefacebookmemes",
-      "categoria": "👴 Memes de velho",
-      "nivel": 2.0,
-      "chance": 0.0118,
-      "afinidade": 0.0
-    },
-    {
-      "subreddit": "boomershumor",
-      "categoria": "👴 Memes de velho",
-      "nivel": 2.0,
-      "chance": 0.0118,
-      "afinidade": 0.0
-    },
-    {
-      "subreddit": "jogatina",
-      "categoria": "🎮 Jogos em geral",
-      "nivel": null,
-      "chance": 0.0115,
+      "chance": 0.0161,
       "afinidade": 0.0
     },
     {
       "subreddit": "wholesomememes",
       "categoria": "😂 Gerais",
       "nivel": 2.0,
-      "chance": 0.0103,
-      "afinidade": 0.35
+      "chance": 0.0143,
+      "afinidade": 0.7
+    },
+    {
+      "subreddit": "jogatina",
+      "categoria": "🎮 Jogos em geral",
+      "nivel": null,
+      "chance": 0.0124,
+      "afinidade": 0.0
+    },
+    {
+      "subreddit": "SKTT1",
+      "categoria": "⚔️ League of Legends",
+      "nivel": null,
+      "chance": 0.0116,
+      "afinidade": 0.0
+    },
+    {
+      "subreddit": "ARAM",
+      "categoria": "⚔️ League of Legends",
+      "nivel": null,
+      "chance": 0.0116,
+      "afinidade": 0.0
+    },
+    {
+      "subreddit": "OldPeopleFacebook",
+      "categoria": "👴 Memes de velho",
+      "nivel": 2.0,
+      "chance": 0.011,
+      "afinidade": 0.0
+    },
+    {
+      "subreddit": "terriblefacebookmemes",
+      "categoria": "👴 Memes de velho",
+      "nivel": 2.0,
+      "chance": 0.011,
+      "afinidade": 0.0
+    },
+    {
+      "subreddit": "boomershumor",
+      "categoria": "👴 Memes de velho",
+      "nivel": 2.0,
+      "chance": 0.011,
+      "afinidade": 0.0
+    },
+    {
+      "subreddit": "HUEstation",
+      "categoria": "🇧🇷 Brasileiros",
+      "nivel": 4.0,
+      "chance": 0.0106,
+      "afinidade": -1.0
     },
     {
       "subreddit": "MinecraftMemes",
       "categoria": "⛏️ Minecraft",
       "nivel": null,
-      "chance": 0.0098,
+      "chance": 0.0092,
       "afinidade": -1.35
     },
     {
       "subreddit": "me_irl",
       "categoria": "😂 Gerais",
       "nivel": 2.0,
-      "chance": 0.0093,
+      "chance": 0.0091,
       "afinidade": 0.25
     },
     {
       "subreddit": "memes",
       "categoria": "😂 Gerais",
       "nivel": 2.0,
-      "chance": 0.0072,
+      "chance": 0.0071,
       "afinidade": 0.0
     },
     {
       "subreddit": "BikiniBottomTwitter",
       "categoria": "😂 Gerais",
       "nivel": 2.0,
-      "chance": 0.0072,
+      "chance": 0.0071,
       "afinidade": 0.0
     },
     {
       "subreddit": "funny",
       "categoria": "😂 Gerais",
       "nivel": 2.0,
-      "chance": 0.0072,
+      "chance": 0.0071,
       "afinidade": 0.0
     }
   ],
   "categorias": {
-    "🇧🇷 Brasileiros": 0.2869,
-    "💀 Humor pesado": 0.2218,
-    "🎮 Jogos em geral": 0.1031,
-    "🤓 Nerd": 0.1031,
-    "🌀 Absurdos": 0.0755,
-    "⛏️ Minecraft": 0.0665,
-    "⚔️ League of Legends": 0.0665,
-    "😂 Gerais": 0.0412,
-    "👴 Memes de velho": 0.0355
+    "🇧🇷 Brasileiros": 0.3116,
+    "💀 Humor pesado": 0.2074,
+    "🎮 Jogos em geral": 0.112,
+    "🤓 Nerd": 0.0964,
+    "🌀 Absurdos": 0.0705,
+    "⛏️ Minecraft": 0.0622,
+    "⚔️ League of Legends": 0.0622,
+    "😂 Gerais": 0.0446,
+    "👴 Memes de velho": 0.0331
   },
   "em_alta": [
     "HolUp",
@@ -280,8 +280,6 @@
     "HUEstation"
   ],
   "recentes": [
-    "https://redd.it/1xzr4yj",
-    "https://redd.it/1y3drnk",
     "https://redd.it/1y2c5gy",
     "https://redd.it/1y0flvu",
     "https://redd.it/1xxypds",
@@ -333,6 +331,7 @@
     "https://redd.it/1y09oa3",
     "https://redd.it/1y4h7te",
     "https://redd.it/1y2fqlw",
-    "https://redd.it/1y1sj67"
+    "https://redd.it/1y1sj67",
+    "https://redd.it/1y3xbew"
   ]
 }
