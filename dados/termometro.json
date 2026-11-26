@@ -6,19 +6,20 @@
     "HolUp": 2.25,
     "LeagueOfMemes": 0.3,
     "MemesBrasil": 0.0,
-    "MinecraftMemes": -1.35,
+    "MinecraftMemes": -1.0,
     "ShitpostBR": -1.0,
     "circojeca": 0.5,
     "dankmemes": 0.35,
     "dontstarve": -1.45,
     "eu_nvr": 1.75,
     "gamememes": 0.7,
+    "jogatina": 0.0,
     "me_irl": 0.25,
     "terriblefacebookmemes": 0.0,
     "wholesomememes": 0.7
   },
   "afinidade_categorias": {
-    "⛏️ Minecraft": 0.0,
+    "⛏️ Minecraft": 0.15,
     "🇧🇷 Brasileiros": 0.3,
     "🎮 Jogos em geral": 0.3,
     "👴 Memes de velho": 0.0,
@@ -535,6 +536,13 @@
       "passou_do_ponto": 0
     },
     "1575602228373364989": {
+      "engracado": 0,
+      "curti": 1,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575617339381256222": {
       "engracado": 0,
       "curti": 0,
       "sem_graca": 0,

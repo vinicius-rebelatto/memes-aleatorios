@@ -820,6 +820,20 @@
       "imagem": "https://i.redd.it/zdkjqemh2g3i1.png",
       "votos_reddit": 2553,
       "postado_em": "2026-11-26T18:00:42-03:00"
+    },
+    {
+      "id_mensagem": "1575632451127214212",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1y616v7",
+      "subreddit": "eu_nvr",
+      "categoria": "🇧🇷 Brasileiros",
+      "titulo": "Eu_nvr",
+      "link": "https://redd.it/1y616v7",
+      "imagem": "https://i.redd.it/1u6sy2izky3i1.png",
+      "votos_reddit": 51,
+      "nivel": 5.0,
+      "nsfw": true,
+      "postado_em": "2026-11-26T19:00:48-03:00"
     }
   ],
   "rankings": [
