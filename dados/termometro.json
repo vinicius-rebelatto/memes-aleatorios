@@ -1,6 +1,7 @@
 {
   "regua": 4.85,
   "afinidade": {
+    "Gamingcirclejerk": 0.0,
     "HUEstation": -1.0,
     "HistoryMemes": 0.35,
     "HolUp": 2.25,
@@ -559,6 +560,13 @@
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 1
+    },
+    "1575647560134041741": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
     }
   }
 }
