@@ -20,6 +20,7 @@
     "gamememes": 0.7,
     "jogatina": 0.35,
     "me_irl": 0.25,
+    "surrealmemes": 0.0,
     "terriblefacebookmemes": 0.0,
     "wholesomememes": 0.7
   },
@@ -27,6 +28,7 @@
     "⚔️ League of Legends": 0.15,
     "⛏️ Minecraft": 0.0,
     "🇧🇷 Brasileiros": 0.3,
+    "🌀 Absurdos": 0.0,
     "🎮 Jogos em geral": 0.45,
     "👴 Memes de velho": 0.0,
     "💀 Humor pesado": 0.0,
@@ -631,6 +633,13 @@
       "passou_do_ponto": 0
     },
     "1575874033931653230": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575889114434109531": {
       "engracado": 0,
       "curti": 0,
       "sem_graca": 0,
