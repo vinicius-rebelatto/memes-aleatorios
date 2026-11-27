@@ -895,6 +895,20 @@
       "imagem": "https://i.redd.it/ovcwpai5yv2i1.png",
       "votos_reddit": 135,
       "postado_em": "2026-11-27T00:00:39-03:00"
+    },
+    {
+      "id_mensagem": "1575723070084096043",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1y60e76",
+      "subreddit": "HolUp",
+      "categoria": "💀 Humor pesado",
+      "titulo": "wait , what the actual F",
+      "link": "https://redd.it/1y60e76",
+      "imagem": "https://i.redd.it/3qaz7chwdy3i1.png",
+      "votos_reddit": 4439,
+      "nivel": 5.0,
+      "nsfw": true,
+      "postado_em": "2026-11-27T01:00:53-03:00"
     }
   ],
   "rankings": [
