@@ -1,41 +1,42 @@
 {
   "regua": 4.85,
   "afinidade": {
-    "ARAM": 0.35,
-    "Gamingcirclejerk": 0.0,
+    "2meirl4meirl": 0.35,
+    "ARAM": 0.7,
+    "Gamingcirclejerk": -0.35,
     "HUEstation": -1.0,
     "HistoryMemes": 0.7,
-    "HolUp": 1.9,
-    "LeagueOfMemes": 0.3,
+    "HolUp": 0.85,
+    "LeagueOfMemes": -0.05,
     "MemesBR": 0.0,
     "MemesBrasil": 0.0,
-    "Minecraft2": -0.35,
-    "MinecraftMemes": -0.65,
-    "PhoenixSC": -0.35,
-    "PrequelMemes": 0.0,
-    "SKTT1": -0.35,
+    "Minecraft2": -0.7,
+    "MinecraftMemes": -1.0,
+    "PhoenixSC": -0.7,
+    "PrequelMemes": -0.35,
+    "SKTT1": -0.7,
     "ShitpostBR": -1.0,
     "circojeca": 0.5,
-    "dankmemes": 0.35,
+    "dankmemes": 0.0,
     "dontstarve": -1.45,
     "eu_nvr": 2.1,
     "gamememes": 0.7,
-    "jogatina": 0.35,
+    "jogatina": 0.7,
     "me_irl": 0.25,
-    "surrealmemes": -0.35,
-    "terriblefacebookmemes": 0.0,
+    "surrealmemes": -0.7,
+    "terriblefacebookmemes": -0.35,
     "wholesomememes": 0.7
   },
   "afinidade_categorias": {
-    "⚔️ League of Legends": 0.0,
-    "⛏️ Minecraft": 0.0,
+    "⚔️ League of Legends": -0.15,
+    "⛏️ Minecraft": -0.45,
     "🇧🇷 Brasileiros": 0.45,
-    "🌀 Absurdos": -0.15,
+    "🌀 Absurdos": -0.3,
     "🎮 Jogos em geral": 0.45,
-    "👴 Memes de velho": 0.0,
-    "💀 Humor pesado": -0.15,
+    "👴 Memes de velho": -0.15,
+    "💀 Humor pesado": -0.6,
     "😂 Gerais": 0.3,
-    "🤓 Nerd": 0.3
+    "🤓 Nerd": 0.15
   },
   "evolucao": [
     {
@@ -532,7 +533,7 @@
     "1575556938920501278": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
@@ -546,20 +547,20 @@
     "1575587137485799618": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575602228373364989": {
       "engracado": 0,
       "curti": 2,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575617339381256222": {
       "engracado": 0,
-      "curti": 1,
+      "curti": 2,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
@@ -567,54 +568,54 @@
     "1575632451127214212": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 1
     },
     "1575647560134041741": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575662617996034078": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575677734535827486": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575692884705808454": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575707922992730343": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 1,
+      "sem_graca": 2,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575723070084096043": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575738124968005743": {
-      "engracado": 0,
+      "engracado": 1,
       "curti": 1,
       "sem_graca": 0,
       "mais_pesado": 0,
@@ -623,20 +624,20 @@
     "1575843844044365837": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 1,
+      "sem_graca": 2,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575858925599981669": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575874033931653230": {
       "engracado": 0,
-      "curti": 0,
+      "curti": 1,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
@@ -644,14 +645,14 @@
     "1575889114434109531": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 1,
+      "sem_graca": 2,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575904224217137183": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 1,
+      "sem_graca": 2,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
@@ -672,13 +673,20 @@
     "1575949528127770796": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 1,
+      "sem_graca": 2,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575964614775017552": {
       "engracado": 0,
-      "curti": 1,
+      "curti": 2,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575979725300695050": {
+      "engracado": 1,
+      "curti": 0,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
