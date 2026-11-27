@@ -8,6 +8,7 @@
     "LeagueOfMemes": 0.3,
     "MemesBrasil": 0.0,
     "MinecraftMemes": -0.65,
+    "PrequelMemes": 0.0,
     "ShitpostBR": -1.0,
     "circojeca": 0.5,
     "dankmemes": 0.35,
@@ -562,6 +563,13 @@
       "passou_do_ponto": 1
     },
     "1575647560134041741": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575662617996034078": {
       "engracado": 0,
       "curti": 0,
       "sem_graca": 0,
