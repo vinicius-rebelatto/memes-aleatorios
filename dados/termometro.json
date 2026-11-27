@@ -3,6 +3,7 @@
   "afinidade": {
     "2meirl4meirl": 0.35,
     "ARAM": 0.7,
+    "ComedyCemetery": -0.35,
     "Gamingcirclejerk": -0.35,
     "HUEstation": -1.0,
     "HistoryMemes": 0.7,
@@ -31,7 +32,7 @@
     "⚔️ League of Legends": -0.15,
     "⛏️ Minecraft": -0.45,
     "🇧🇷 Brasileiros": 0.45,
-    "🌀 Absurdos": -0.3,
+    "🌀 Absurdos": -0.45,
     "🎮 Jogos em geral": 0.45,
     "👴 Memes de velho": -0.15,
     "💀 Humor pesado": -0.6,
@@ -688,6 +689,13 @@
       "engracado": 1,
       "curti": 0,
       "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575994824132132874": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     }
