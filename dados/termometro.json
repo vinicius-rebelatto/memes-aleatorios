@@ -4,8 +4,8 @@
     "ARAM": 0.35,
     "Gamingcirclejerk": 0.0,
     "HUEstation": -1.0,
-    "HistoryMemes": 0.35,
-    "HolUp": 2.25,
+    "HistoryMemes": 0.7,
+    "HolUp": 1.9,
     "LeagueOfMemes": 0.3,
     "MemesBR": 0.0,
     "MemesBrasil": 0.0,
@@ -13,29 +13,29 @@
     "MinecraftMemes": -0.65,
     "PhoenixSC": -0.35,
     "PrequelMemes": 0.0,
-    "SKTT1": 0.0,
+    "SKTT1": -0.35,
     "ShitpostBR": -1.0,
     "circojeca": 0.5,
     "dankmemes": 0.35,
     "dontstarve": -1.45,
-    "eu_nvr": 1.75,
+    "eu_nvr": 2.1,
     "gamememes": 0.7,
     "jogatina": 0.35,
     "me_irl": 0.25,
-    "surrealmemes": 0.0,
+    "surrealmemes": -0.35,
     "terriblefacebookmemes": 0.0,
     "wholesomememes": 0.7
   },
   "afinidade_categorias": {
-    "⚔️ League of Legends": 0.15,
+    "⚔️ League of Legends": 0.0,
     "⛏️ Minecraft": 0.0,
-    "🇧🇷 Brasileiros": 0.3,
-    "🌀 Absurdos": 0.0,
+    "🇧🇷 Brasileiros": 0.45,
+    "🌀 Absurdos": -0.15,
     "🎮 Jogos em geral": 0.45,
     "👴 Memes de velho": 0.0,
-    "💀 Humor pesado": 0.0,
+    "💀 Humor pesado": -0.15,
     "😂 Gerais": 0.3,
-    "🤓 Nerd": 0.15
+    "🤓 Nerd": 0.3
   },
   "evolucao": [
     {
@@ -644,20 +644,20 @@
     "1575889114434109531": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575904224217137183": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
     "1575919335598334085": {
       "engracado": 0,
-      "curti": 0,
+      "curti": 1,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
@@ -672,6 +672,13 @@
     "1575949528127770796": {
       "engracado": 0,
       "curti": 0,
+      "sem_graca": 1,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575964614775017552": {
+      "engracado": 0,
+      "curti": 1,
       "sem_graca": 0,
       "mais_pesado": 0,
       "passou_do_ponto": 0
