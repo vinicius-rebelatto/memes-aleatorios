@@ -1,15 +1,16 @@
 {
   "regua": 4.85,
   "afinidade": {
-    "ARAM": 0.0,
+    "ARAM": 0.35,
     "Gamingcirclejerk": 0.0,
     "HUEstation": -1.0,
     "HistoryMemes": 0.35,
     "HolUp": 2.25,
     "LeagueOfMemes": 0.3,
     "MemesBrasil": 0.0,
-    "Minecraft2": 0.0,
+    "Minecraft2": -0.35,
     "MinecraftMemes": -0.65,
+    "PhoenixSC": -0.35,
     "PrequelMemes": 0.0,
     "ShitpostBR": -1.0,
     "circojeca": 0.5,
@@ -23,8 +24,8 @@
     "wholesomememes": 0.7
   },
   "afinidade_categorias": {
-    "⚔️ League of Legends": 0.0,
-    "⛏️ Minecraft": 0.3,
+    "⚔️ League of Legends": 0.15,
+    "⛏️ Minecraft": 0.0,
     "🇧🇷 Brasileiros": 0.3,
     "🎮 Jogos em geral": 0.45,
     "👴 Memes de velho": 0.0,
@@ -597,7 +598,7 @@
     "1575707922992730343": {
       "engracado": 0,
       "curti": 0,
-      "sem_graca": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     },
@@ -610,8 +611,15 @@
     },
     "1575738124968005743": {
       "engracado": 0,
-      "curti": 0,
+      "curti": 1,
       "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575843844044365837": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 1,
       "mais_pesado": 0,
       "passou_do_ponto": 0
     }
