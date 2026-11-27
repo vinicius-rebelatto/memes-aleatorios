@@ -909,6 +909,18 @@
       "nivel": 5.0,
       "nsfw": true,
       "postado_em": "2026-11-27T01:00:53-03:00"
+    },
+    {
+      "id_mensagem": "1575738124968005743",
+      "fonte": "reddit",
+      "chave": "https://redd.it/1y52oqg",
+      "subreddit": "ARAM",
+      "categoria": "⚔️ League of Legends",
+      "titulo": "they're building percent pen. wonder what augment they got?",
+      "link": "https://redd.it/1y52oqg",
+      "imagem": "https://i.redd.it/uyz8wjce4q3i1.png",
+      "votos_reddit": 1554,
+      "postado_em": "2026-11-27T02:00:40-03:00"
     }
   ],
   "rankings": [
