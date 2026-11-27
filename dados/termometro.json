@@ -25,6 +25,7 @@
     "🇧🇷 Brasileiros": 0.3,
     "🎮 Jogos em geral": 0.45,
     "👴 Memes de velho": 0.0,
+    "💀 Humor pesado": 0.0,
     "😂 Gerais": 0.3,
     "🤓 Nerd": 0.15
   },
@@ -570,6 +571,13 @@
       "passou_do_ponto": 0
     },
     "1575662617996034078": {
+      "engracado": 0,
+      "curti": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1575677734535827486": {
       "engracado": 0,
       "curti": 0,
       "sem_graca": 0,
