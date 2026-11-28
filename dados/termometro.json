@@ -4,7 +4,7 @@
     "2meirl4meirl": 0.0,
     "ARAM": 0.7,
     "ComedyCemetery": -0.35,
-    "Gamingcirclejerk": -0.35,
+    "Gamingcirclejerk": 0.0,
     "HUEstation": -1.0,
     "HistoryMemes": 0.7,
     "HolUp": 0.85,
@@ -33,7 +33,7 @@
     "⛏️ Minecraft": -0.45,
     "🇧🇷 Brasileiros": 0.3,
     "🌀 Absurdos": -0.45,
-    "🎮 Jogos em geral": 0.45,
+    "🎮 Jogos em geral": 0.6,
     "👴 Memes de velho": -0.15,
     "💀 Humor pesado": -0.75,
     "😂 Gerais": 0.3,
@@ -715,6 +715,13 @@
     },
     "1576040123446075572": {
       "engracado": 0,
+      "curti": 0,
+      "sem_graca": 0,
+      "mais_pesado": 0,
+      "passou_do_ponto": 0
+    },
+    "1576055223041003775": {
+      "engracado": 1,
       "curti": 0,
       "sem_graca": 0,
       "mais_pesado": 0,
